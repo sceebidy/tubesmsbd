@@ -1,6 +1,6 @@
 FROM php:8.4-cli
 
-ARG CACHEBUST=3
+ARG CACHEBUST=4
 
 RUN apt-get update && apt-get install -y \
     git curl zip unzip libpng-dev libxml2-dev libzip-dev \
@@ -17,8 +17,6 @@ RUN composer install --no-dev --optimize-autoloader
 
 RUN sed -i 's/return $port + $this->portOffset;/return (int) $port + $this->portOffset;/' vendor/laravel/framework/src/Illuminate/Foundation/Console/ServeCommand.php
 
-RUN echo '#!/bin/bash\nphp artisan migrate --force\nphp artisan storage:link\nexec php artisan serve --host=0.0.0.0 --port=${PORT:-8000}' > /start.sh && chmod +x /start.sh
-
 EXPOSE 8000
 
-CMD ["/bin/bash", "/start.sh"]
+CMD ["/bin/bash", "-c", "echo PORT=$PORT && php artisan migrate --force && php artisan storage:link && php artisan serve --host=0.0.0.0 --port=${PORT:-8000}"]
