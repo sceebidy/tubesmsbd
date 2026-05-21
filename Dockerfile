@@ -15,4 +15,4 @@ RUN composer install --no-dev --optimize-autoloader
 
 EXPOSE 8000
 
-CMD php artisan migrate --force && php artisan storage:link && php artisan serve --host=0.0.0.0 --port=$PORT
+CMD php artisan migrate --force && php artisan storage:link && php -S 0.0.0.0:$PORT -t public
