@@ -1,6 +1,6 @@
 FROM php:8.4-cli
 
-ARG CACHEBUST=7
+ARG CACHEBUST=8
 
 RUN apt-get update && apt-get install -y \
     git curl zip unzip libpng-dev libxml2-dev libzip-dev \
@@ -13,8 +13,8 @@ COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 WORKDIR /app
 COPY . .
 
-RUN composer install --no-dev --optimize-autoloader
-RUN composer dump-autoload --optimize --classmap-authoritative
+RUN composer install --no-dev --no-scripts --no-interaction
+RUN composer dump-autoload --optimize --classmap-authoritative --no-interaction
 
 RUN sed -i 's/return $port + $this->portOffset;/return (int) $port + $this->portOffset;/' vendor/laravel/framework/src/Illuminate/Foundation/Console/ServeCommand.php
 
