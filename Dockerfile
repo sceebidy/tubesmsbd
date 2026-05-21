@@ -1,5 +1,7 @@
 FROM php:8.4-cli
 
+ARG CACHEBUST=2
+
 RUN apt-get update && apt-get install -y \
     git curl zip unzip libpng-dev libxml2-dev libzip-dev \
     libonig-dev libfreetype6-dev libjpeg62-turbo-dev \
