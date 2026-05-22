@@ -655,7 +655,8 @@ $kinerjaData = \App\Models\KinerjaCleaning::with('user')
     'todayPalmWeight',
     'patroliData',
     'kinerjaData'
-));
+        ));
+    }
 
     public function managerHapusPegawai($id)
     {
