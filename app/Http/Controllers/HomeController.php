@@ -625,24 +625,37 @@ class HomeController extends Controller
             })
             ->sum('berat_kg') ?? 0;
 
+            // Data Patroli Security
+$patroliData = \App\Models\PatroliSecurity::with('user')
+    ->whereBetween('waktu_patroli', [$startDate, $endDate])
+    ->orderBy('waktu_patroli', 'desc')
+    ->get();
+
+// Data Kinerja Cleaning
+$kinerjaData = \App\Models\KinerjaCleaning::with('user')
+    ->whereBetween('tanggal', [$startDate->toDateString(), $endDate->toDateString()])
+    ->orderBy('tanggal', 'desc')
+    ->get();
+
         return view('admin.laporan', compact(
-            'startDate',
-            'endDate',
-            'role',
-            'dataType',
-            'totalPegawai',
-            'totalPalmWeight',
-            'averagePalmWeight',
-            'totalHadir',
-            'dailyPalmWeight',
-            'dailyAttendance',
-            'topPerformers',
-            'detailedAttendances',
-            'hasPalmAccess',
-            'todayAttendanceCount',
-            'todayPalmWeight'
-        ));
-    }
+    'startDate',
+    'endDate',
+    'role',
+    'dataType',
+    'totalPegawai',
+    'totalPalmWeight',
+    'averagePalmWeight',
+    'totalHadir',
+    'dailyPalmWeight',
+    'dailyAttendance',
+    'topPerformers',
+    'detailedAttendances',
+    'hasPalmAccess',
+    'todayAttendanceCount',
+    'todayPalmWeight',
+    'patroliData',
+    'kinerjaData'
+));
 
     public function managerHapusPegawai($id)
     {

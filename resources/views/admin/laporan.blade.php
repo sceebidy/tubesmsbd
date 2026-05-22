@@ -252,11 +252,17 @@
                 </thead>
                 <tbody>
                     @foreach($detailedAttendances as $a)
-                        @php
-                            $panen = \App\Models\CatatanPanen::where('id_pegawai', $a->user_id)
-                                ->whereDate('tanggal', $a->date)
-                                ->first();
-                        @endphp
+                       @php
+    $panen = \App\Models\CatatanPanen::where('id_pegawai', $a->user_id)
+        ->whereDate('tanggal', $a->date)
+        ->first();
+    $patroli = \App\Models\PatroliSecurity::where('user_id', $a->user_id)
+        ->whereDate('waktu_patroli', $a->date)
+        ->get();
+    $kinerja = \App\Models\KinerjaCleaning::where('user_id', $a->user_id)
+        ->whereDate('tanggal', $a->date)
+        ->get();
+@endphp
                         <tr class="border-b border-gray-100 hover:bg-gray-50 transition">
                             @if($dataType == 'all')
                             <td class="px-4 py-3 text-sm text-gray-600">{{ \Carbon\Carbon::parse($a->date)->format('d M Y') }}</td>
@@ -303,19 +309,61 @@
                                 @endif
                             </td>
                             <td class="px-4 py-3">
-                                @if($a->photo_path)
-                                    <a href="{{ asset('storage/'.$a->photo_path) }}" target="_blank"
-                                        class="inline-flex px-3 py-1.5 rounded-full text-xs font-semibold bg-[#eaf4f1] text-[#2c5e4e] hover:bg-[#d5ecdf] transition">Lihat</a>
-                                @elseif($a->checkout_photo_path)
-                                    <a href="{{ asset('storage/'.$a->checkout_photo_path) }}" target="_blank"
-                                        class="inline-flex px-3 py-1.5 rounded-full text-xs font-semibold bg-[#eaf4f1] text-[#2c5e4e] hover:bg-[#d5ecdf] transition">Lihat</a>
-                                @elseif($panen && $panen->foto_panen)
-                                    <a href="{{ asset('storage/'.$panen->foto_panen) }}" target="_blank"
-                                        class="inline-flex px-3 py-1.5 rounded-full text-xs font-semibold bg-[#eaf4f1] text-[#2c5e4e] hover:bg-[#d5ecdf] transition">Lihat</a>
-                                @else
-                                    <span class="text-gray-400">-</span>
-                                @endif
-                            </td>
+    <div class="flex flex-wrap gap-1">
+        {{-- Foto Check In --}}
+        @if($a->photo_path)
+            <a href="{{ asset('storage/'.$a->photo_path) }}" target="_blank"
+                class="inline-flex px-2 py-1 rounded-full text-xs font-semibold bg-[#eaf4f1] text-[#2c5e4e] hover:bg-[#d5ecdf] transition">
+                Check In
+            </a>
+        @endif
+
+        {{-- Foto Check Out --}}
+        @if($a->checkout_photo_path)
+            <a href="{{ asset('storage/'.$a->checkout_photo_path) }}" target="_blank"
+                class="inline-flex px-2 py-1 rounded-full text-xs font-semibold bg-blue-100 text-blue-700 hover:bg-blue-200 transition">
+                Check Out
+            </a>
+        @endif
+
+        {{-- Foto Panen --}}
+        @if($panen && $panen->foto_panen)
+            <a href="{{ asset('storage/'.$panen->foto_panen) }}" target="_blank"
+                class="inline-flex px-2 py-1 rounded-full text-xs font-semibold bg-amber-100 text-amber-700 hover:bg-amber-200 transition">
+                Panen
+            </a>
+        @endif
+
+        {{-- Foto Patroli Security --}}
+        @if($a->user?->role === 'security' && $patroli->count())
+            @foreach($patroli as $p)
+                @if($p->foto)
+                    <a href="{{ asset('storage/'.$p->foto) }}" target="_blank"
+                        class="inline-flex px-2 py-1 rounded-full text-xs font-semibold bg-purple-100 text-purple-700 hover:bg-purple-200 transition">
+                        Patroli: {{ $p->nama_area }}
+                    </a>
+                @endif
+            @endforeach
+        @endif
+
+        {{-- Foto Kinerja Cleaning --}}
+        @if($a->user?->role === 'cleaning' && $kinerja->count())
+            @foreach($kinerja as $k)
+                @if($k->foto)
+                    <a href="{{ asset('storage/'.$k->foto) }}" target="_blank"
+                        class="inline-flex px-2 py-1 rounded-full text-xs font-semibold bg-orange-100 text-orange-700 hover:bg-orange-200 transition">
+                        Kinerja: {{ $k->area }}
+                    </a>
+                @endif
+            @endforeach
+        @endif
+
+        {{-- Tidak ada foto --}}
+        @if(!$a->photo_path && !$a->checkout_photo_path && (!$panen || !$panen->foto_panen) && $patroli->isEmpty() && $kinerja->isEmpty())
+            <span class="text-gray-400">-</span>
+        @endif
+    </div>
+</td>
                         </tr>
                     @endforeach
                 </tbody>

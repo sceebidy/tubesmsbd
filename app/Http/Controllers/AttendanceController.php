@@ -122,9 +122,13 @@ class AttendanceController extends Controller
 
         $checkInTime = now();
 
-        $status = $checkInTime->format('H:i') <= '08:00'
-            ? 'tepat waktu'
-            : 'terlambat';
+      if (in_array($user->role, ['security', 'cleaning'])) {
+    $status = 'tepat waktu'; // Shift fleksibel, tidak ada terlambat
+} else {
+    $status = $checkInTime->format('H:i') <= '08:00'
+        ? 'tepat waktu'
+        : 'terlambat';
+}
 
         /*
         |--------------------------------------------------------------------------

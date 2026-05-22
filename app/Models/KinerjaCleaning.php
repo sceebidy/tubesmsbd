@@ -1,9 +1,6 @@
 <?php
-
 namespace App\Models;
-
 use Illuminate\Database\Eloquent\Model;
-
 class KinerjaCleaning extends Model
 {
     protected $fillable = [
@@ -13,4 +10,9 @@ class KinerjaCleaning extends Model
         'foto',
         'tanggal',
     ];
+
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
 }
