@@ -9,54 +9,47 @@ use App\Models\PatroliSecurity;
 
 class SecurityPatroliController extends Controller
 {
-    public function index()
-    {
-        $riwayatHariIni = PatroliSecurity::where('user_id', Auth::id())
-            ->whereDate('waktu_patroli', today())
-            ->latest()
-            ->get();
-
-        return view('security.patroli', compact('riwayatHariIni'));
-    }
-
     public function store(Request $request)
-    {
-        $request->validate([
-            'nama_area' => 'required',
-            'keterangan' => 'nullable',
-            'foto' => 'required',
-        ]);
+{
+    $request->validate([
+        'nama_area' => 'required',
+        'keterangan' => 'nullable|array',
+        'keterangan.*' => 'nullable|string',
+        'foto' => 'required|array',
+        'foto.*' => 'required|string',
+    ]);
 
-        $image = $request->foto;
+    $savedCount = 0;
 
-        $image = str_replace('data:image/jpeg;base64,', '', $image);
-        $image = str_replace('data:image/png;base64,', '', $image);
-        $image = str_replace(' ', '+', $image);
+    foreach ($request->foto as $index => $fotoBase64) {
+        if (empty($fotoBase64)) continue;
 
-        // folder tujuan
-        $folderPath = public_path('uploads/patroli');
-
-        // buat folder jika belum ada
-        if (!File::exists($folderPath)) {
-            File::makeDirectory($folderPath, 0755, true);
+        $imageData = $fotoBase64;
+        if (preg_match('/^data:image\/(\w+);base64,/', $imageData)) {
+            $imageData = substr($imageData, strpos($imageData, ',') + 1);
         }
+        $imageData = str_replace(' ', '+', $imageData);
+        $decoded = base64_decode($imageData);
+        if (!$decoded) continue;
 
-        $imageName = 'patroli_' . time() . '.jpg';
-
-        // simpan gambar
-        File::put(
-            $folderPath . '/' . $imageName,
-            base64_decode($image)
-        );
+        $fileName = 'patroli/' . date('Y/m/d') . '/' . uniqid() . '.jpg';
+        Storage::disk('public')->put($fileName, $decoded);
 
         PatroliSecurity::create([
             'user_id' => Auth::id(),
-            'nama_area' => $request->nama_area,
-            'keterangan' => $request->keterangan,
-            'foto' => 'uploads/patroli/' . $imageName,
+            'nama_area' => is_array($request->nama_area) ? ($request->nama_area[$index] ?? $request->nama_area[0]) : $request->nama_area,
+            'keterangan' => is_array($request->keterangan) ? ($request->keterangan[$index] ?? '') : ($request->keterangan ?? ''),
+            'foto' => $fileName,
             'waktu_patroli' => now(),
         ]);
 
-        return back()->with('success', 'Bukti patroli berhasil dikirim');
+        $savedCount++;
     }
+
+    if ($savedCount === 0) {
+        return back()->with('error', 'Tidak ada data yang berhasil disimpan.');
+    }
+
+    return back()->with('success', $savedCount . ' bukti patroli berhasil dikirim');
+}
 }
