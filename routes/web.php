@@ -14,6 +14,9 @@ use App\Http\Controllers\Auth\PasswordResetLinkController;
 use App\Http\Controllers\Auth\RegisteredUserController;
 use App\Http\Controllers\CleaningKinerjaController;
 use App\Http\Controllers\SecurityPatroliController;
+use App\Http\Controllers\LaporanPanenController;
+use App\Http\Controllers\PengajuanController;
+use App\Http\Controllers\PengajuanApprovalController; // TAMBAHKAN
 
 // ======================================================================
 // PUBLIC ROUTES
@@ -68,9 +71,21 @@ Route::middleware('auth')->group(function () {
     // ATTENDANCE
     // ======================================================================
     Route::get('/attendance', [AttendanceController::class, 'index'])->name('attendance.index');
-    Route::post('/attendance', [AttendanceController::class, 'store'])->name('attendance.store');
+    Route::post('/attendance/checkin', [AttendanceController::class, 'store'])->name('attendance.store');
     Route::post('/attendance/checkout', [AttendanceController::class, 'checkout'])->name('attendance.checkout');
     Route::get('/attendance/history', [AttendanceController::class, 'history'])->name('attendance.history');
+    
+    // API untuk cek status checkout
+    Route::get('/api/cek-status-checkout', [AttendanceController::class, 'cekStatusCheckout'])->name('api.cek.checkout');
+
+    // ======================================================================
+    // PENGAJUAN IZIN/SAKIT (UNTUK SEMUA ROLE KECUALI ADMIN & MANAGER)
+    // ======================================================================
+    Route::prefix('pengajuan')->name('pengajuan.')->group(function () {
+        Route::get('/', [PengajuanController::class, 'index'])->name('index');
+        Route::post('/', [PengajuanController::class, 'store'])->name('store');
+        Route::delete('/{id}', [PengajuanController::class, 'batal'])->name('batal');
+    });
 
     // ======================================================================
     // USER DASHBOARDS (BASED ON ROLE)
@@ -78,39 +93,40 @@ Route::middleware('auth')->group(function () {
     Route::prefix('user')->group(function () {
         Route::get('/dashboard', [HomeController::class, 'userDashboard'])->name('user.dashboard');
         Route::get('/riwayat', [HomeController::class, 'userRiwayat'])->name('user.riwayat');
+
+        /*
+        |--------------------------------------------------------------------------
+        | PANEN PEKERJA
+        |--------------------------------------------------------------------------
+        */
+        Route::get('/panen', [LaporanPanenController::class, 'index'])->name('user.panen');
+        Route::post('/panen', [LaporanPanenController::class, 'store'])->name('user.panen.store');
     });
 
-   Route::prefix('security')->group(function () {
+    Route::prefix('security')->group(function () {
+        Route::get('/dashboard', [HomeController::class, 'securityDashboard'])->name('security.dashboard');
 
-    Route::get('/dashboard', [HomeController::class, 'securityDashboard'])
-        ->name('security.dashboard');
+        // HALAMAN PATROLI
+        Route::get('/patroli', [SecurityPatroliController::class, 'index'])->name('security.patroli');
+        Route::post('/patroli/store', [SecurityPatroliController::class, 'store'])->name('security.patroli.store');
+    });
 
-    // HALAMAN PATROLI
-    Route::get('/patroli', [SecurityPatroliController::class, 'index'])
-        ->name('security.patroli');
-
-    // SIMPAN PATROLI
-    Route::post('/patroli/store', [SecurityPatroliController::class, 'store'])
-        ->name('security.patroli.store');
-
-});
-
-Route::prefix('cleaning')->group(function () {
-
-    Route::get('/dashboard', [HomeController::class, 'cleaningDashboard'])
-        ->name('cleaning.dashboard');
-
-    Route::get('/kinerja', [CleaningKinerjaController::class, 'index'])
-        ->name('cleaning.kinerja');
-
-    Route::post('/kinerja', [CleaningKinerjaController::class, 'store'])
-        ->name('cleaning.kinerja.store');
-});
+    Route::prefix('cleaning')->group(function () {
+        Route::get('/dashboard', [HomeController::class, 'cleaningDashboard'])->name('cleaning.dashboard');
+        Route::get('/kinerja', [CleaningKinerjaController::class, 'index'])->name('cleaning.kinerja');
+        Route::post('/kinerja', [CleaningKinerjaController::class, 'store'])->name('cleaning.kinerja.store');
+    });
 
     Route::prefix('kantoran')->group(function () {
         Route::get('/dashboard', [HomeController::class, 'kantoranDashboard'])->name('kantoran.dashboard');
     });
-
+    
+    Route::prefix('mandor')->group(function () {
+        Route::get('/dashboard', [HomeController::class, 'mandorDashboard'])->name('mandor.dashboard');
+        Route::get('/laporan-panen', [LaporanPanenController::class, 'mandorIndex'])->name('mandor.panen');
+        Route::post('/laporan-panen/{tanggal}/verifikasi', [LaporanPanenController::class, 'verifikasiMandor'])->name('mandor.panen.verifikasi');
+    });
+  
     // ======================================================================
     // MANAGER ROUTES
     // ======================================================================
@@ -154,37 +170,28 @@ Route::prefix('cleaning')->group(function () {
         Route::get('/log-absen/export', [AttendanceController::class, 'exportLogAbsensi'])->name('log-absen.export');
 
         // ======================================================================
+        // PENGAJUAN IZIN/SAKIT APPROVAL (HANYA ADMIN)
+        // ======================================================================
+        Route::prefix('pengajuan')->name('pengajuan.')->group(function () {
+            Route::get('/approval', [PengajuanApprovalController::class, 'index'])->name('approval.index');
+            Route::get('/approval/{id}', [PengajuanApprovalController::class, 'detail'])->name('approval.detail');
+            Route::post('/{id}/approve', [PengajuanApprovalController::class, 'approve'])->name('approve');
+            Route::post('/{id}/reject', [PengajuanApprovalController::class, 'reject'])->name('reject');
+        });
+
+        // ======================================================================
         // RAPOT MANAGEMENT
         // ======================================================================
         Route::prefix('rapot')->name('rapot.')->group(function () {
-            // List pegawai untuk evaluasi
             Route::get('/', [RapotController::class, 'index'])->name('index');
-            
-            // Form evaluasi kinerja
             Route::get('/evaluasi/{user}', [RapotController::class, 'create'])->name('evaluasi.create');
-            
-            // Simpan evaluasi kinerja
             Route::post('/evaluasi/{user}', [RapotController::class, 'store'])->name('evaluasi.store');
-            
-            // Tampilkan detail evaluasi
             Route::get('/evaluasi/show/{rapot}', [RapotController::class, 'showEvaluasi'])->name('evaluasi.show');
-            
-            // Generate rapot otomatis (standar)
             Route::post('/generate/{user}', [RapotController::class, 'generateRapot'])->name('generate');
-            
-            // Detail rapot umum
             Route::get('/{rapot}', [RapotController::class, 'show'])->name('show');
-            
-            // Edit rapot
             Route::get('/{rapot}/edit', [RapotController::class, 'edit'])->name('edit');
-            
-            // Update rapot
             Route::put('/{rapot}', [RapotController::class, 'update'])->name('update');
-            
-            // Hapus rapot
             Route::delete('/{rapot}', [RapotController::class, 'destroy'])->name('delete');
-            
-            // Export PDF
             Route::get('/{rapot}/export-pdf', [RapotController::class, 'exportPDF'])->name('export.pdf');
         });
 
@@ -219,8 +226,7 @@ Route::prefix('cleaning')->group(function () {
     // ======================================================================
     // EXPORT ROUTES (Admin & Manager only)
     // ======================================================================
-    Route::middleware(['auth'])->prefix('export')->group(function () {
-        // Cek hak akses akan dilakukan di Controller
+    Route::prefix('export')->group(function () {
         Route::get('/all', [HomeController::class, 'exportAllCsv'])->name('export.all');
         Route::get('/all-data', [HomeController::class, 'exportAllCsvAllTime'])->name('export.all.everything');
         Route::get('/sheet-absen', [HomeController::class, 'exportSheetAbsen'])->name('export.sheet.absen');

@@ -102,28 +102,49 @@
         <nav class="flex-1 px-3 py-6 space-y-1 overflow-y-auto">
             @auth
                 @switch(Auth::user()->role)
-                    @case('admin')
-                        <a href="{{ route('admin.dashboard') }}" class="nav-item flex items-center gap-3 px-4 py-2.5 rounded-xl text-gray-700 font-medium transition-all duration-200 {{ request()->routeIs('admin.dashboard') ? 'bg-[#2c5e4e] text-white' : 'hover:bg-[#eaf4f1] hover:text-[#2c5e4e]' }}">
-                            <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
-                            <span>Dashboard</span>
-                        </a>
-                        <a href="{{ route('admin.pegawai') }}" class="nav-item flex items-center gap-3 px-4 py-2.5 rounded-xl text-gray-700 font-medium transition-all duration-200 {{ request()->routeIs('admin.pegawai') ? 'bg-[#2c5e4e] text-white' : 'hover:bg-[#eaf4f1] hover:text-[#2c5e4e]' }}">
-                            <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/></svg>
-                            <span>Pegawai</span>
-                        </a>
-                        <a href="{{ route('admin.laporan') }}" class="nav-item flex items-center gap-3 px-4 py-2.5 rounded-xl text-gray-700 font-medium transition-all duration-200 {{ request()->routeIs('admin.laporan') ? 'bg-[#2c5e4e] text-white' : 'hover:bg-[#eaf4f1] hover:text-[#2c5e4e]' }}">
-                            <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
-                            <span>Laporan</span>
-                        </a>
-                        <a href="{{ route('admin.rapot.index') }}" class="nav-item flex items-center gap-3 px-4 py-2.5 rounded-xl text-gray-700 font-medium transition-all duration-200 {{ request()->routeIs('admin.rapot.*') ? 'bg-[#2c5e4e] text-white' : 'hover:bg-[#eaf4f1] hover:text-[#2c5e4e]' }}">
-                            <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
-                            <span>Rapot</span>
-                        </a>
-                        <a href="{{ route('admin.pengumuman') }}" class="nav-item flex items-center gap-3 px-4 py-2.5 rounded-xl text-gray-700 font-medium transition-all duration-200 {{ request()->routeIs('admin.pengumuman') ? 'bg-[#2c5e4e] text-white' : 'hover:bg-[#eaf4f1] hover:text-[#2c5e4e]' }}">
-                            <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M11 5.882V19.24a1.76 1.76 0 01-3.417.592l-2.147-6.15M18 13a3 3 0 100-6M5.436 13.683A4.001 4.001 0 017 6h1.832c4.1 0 7.625-1.234 9.168-3v14c-1.543-1.766-5.067-3-9.168-3H7a3.988 3.988 0 01-1.564-.317z"/></svg>
-                            <span>Pengumuman</span>
-                        </a>
-                        @break
+                   {{-- TAMBAHKAN INI DI DALAM SECTION ADMIN --}}
+@case('admin')
+    <a href="{{ route('admin.dashboard') }}" class="nav-item flex items-center gap-3 px-4 py-2.5 rounded-xl text-gray-700 font-medium transition-all duration-200 {{ request()->routeIs('admin.dashboard') ? 'bg-[#2c5e4e] text-white' : 'hover:bg-[#eaf4f1] hover:text-[#2c5e4e]' }}">
+        <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
+        <span>Dashboard</span>
+    </a>
+    <a href="{{ route('admin.pegawai') }}" class="nav-item flex items-center gap-3 px-4 py-2.5 rounded-xl text-gray-700 font-medium transition-all duration-200 {{ request()->routeIs('admin.pegawai') ? 'bg-[#2c5e4e] text-white' : 'hover:bg-[#eaf4f1] hover:text-[#2c5e4e]' }}">
+        <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/></svg>
+        <span>Pegawai</span>
+    </a>
+    <a href="{{ route('admin.laporan') }}" class="nav-item flex items-center gap-3 px-4 py-2.5 rounded-xl text-gray-700 font-medium transition-all duration-200 {{ request()->routeIs('admin.laporan') ? 'bg-[#2c5e4e] text-white' : 'hover:bg-[#eaf4f1] hover:text-[#2c5e4e]' }}">
+        <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+        <span>Laporan</span>
+    </a>
+    <a href="{{ route('admin.rapot.index') }}" class="nav-item flex items-center gap-3 px-4 py-2.5 rounded-xl text-gray-700 font-medium transition-all duration-200 {{ request()->routeIs('admin.rapot.*') ? 'bg-[#2c5e4e] text-white' : 'hover:bg-[#eaf4f1] hover:text-[#2c5e4e]' }}">
+        <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+        <span>Rapot</span>
+    </a>
+    <a href="{{ route('admin.pengumuman') }}" class="nav-item flex items-center gap-3 px-4 py-2.5 rounded-xl text-gray-700 font-medium transition-all duration-200 {{ request()->routeIs('admin.pengumuman') ? 'bg-[#2c5e4e] text-white' : 'hover:bg-[#eaf4f1] hover:text-[#2c5e4e]' }}">
+        <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M11 5.882V19.24a1.76 1.76 0 01-3.417.592l-2.147-6.15M18 13a3 3 0 100-6M5.436 13.683A4.001 4.001 0 017 6h1.832c4.1 0 7.625-1.234 9.168-3v14c-1.543-1.766-5.067-3-9.168-3H7a3.988 3.988 0 01-1.564-.317z"/></svg>
+        <span>Pengumuman</span>
+    </a>
+    
+    {{-- ============================================================ --}}
+    {{-- MENU APPROVAL PENGAJUAN IZIN/SAKIT (TAMBAHKAN INI) --}}
+    {{-- ============================================================ --}}
+    <a href="{{ route('admin.pengajuan.approval.index') }}" class="nav-item flex items-center gap-3 px-4 py-2.5 rounded-xl text-gray-700 font-medium transition-all duration-200 {{ request()->routeIs('admin.pengajuan.approval*') ? 'bg-[#2c5e4e] text-white' : 'hover:bg-[#eaf4f1] hover:text-[#2c5e4e]' }}">
+        <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"/>
+        </svg>
+        <span>Approval Izin/Sakit</span>
+        @php
+            $pendingCount = \App\Models\Pengajuan::where('status', 'pending')
+                ->whereHas('user', function($q) {
+                    $q->whereIn('role', ['user', 'cleaning', 'kantoran', 'security']);
+                })
+                ->count();
+        @endphp
+        @if($pendingCount > 0)
+            <span class="ml-auto bg-red-500 text-white text-xs px-2 py-0.5 rounded-full">{{ $pendingCount }}</span>
+        @endif
+    </a>
+    @break
                         
                     @case('manager')
                         <a href="{{ route('manager.dashboard') }}" class="nav-item flex items-center gap-3 px-4 py-2.5 rounded-xl text-gray-700 font-medium transition-all duration-200 {{ request()->routeIs('manager.dashboard') ? 'bg-[#2c5e4e] text-white' : 'hover:bg-[#eaf4f1] hover:text-[#2c5e4e]' }}">
@@ -138,8 +159,7 @@
                             <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/></svg>
                             <span>Kelola Pegawai</span>
                         </a>
-                        <a href="{{ route('manager.pengumuman') }}" 
-class="nav-item flex items-center gap-3 px-4 py-2.5 rounded-xl text-gray-700 font-medium transition-all duration-200 {{ request()->routeIs('manager.pengumuman') ? 'bg-[#2c5e4e] text-white' : 'hover:bg-[#eaf4f1] hover:text-[#2c5e4e]' }}">
+                        <a href="{{ route('manager.pengumuman') }}" class="nav-item flex items-center gap-3 px-4 py-2.5 rounded-xl text-gray-700 font-medium transition-all duration-200 {{ request()->routeIs('manager.pengumuman') ? 'bg-[#2c5e4e] text-white' : 'hover:bg-[#eaf4f1] hover:text-[#2c5e4e]' }}">
                             <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M11 5.882V19.24a1.76 1.76 0 01-3.417.592l-2.147-6.15M18 13a3 3 0 100-6M5.436 13.683A4.001 4.001 0 017 6h1.832c4.1 0 7.625-1.234 9.168-3v14c-1.543-1.766-5.067-3-9.168-3H7a3.988 3.988 0 01-1.564-.317z"/></svg>
                             <span>Pengumuman</span>
                         </a>
@@ -154,6 +174,18 @@ class="nav-item flex items-center gap-3 px-4 py-2.5 rounded-xl text-gray-700 fon
                             <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
                             <span>Riwayat Absen</span>
                         </a>
+                        <a href="{{ route('user.panen') }}" class="nav-item flex items-center gap-3 px-4 py-2.5 rounded-xl text-gray-700 font-medium transition-all duration-200 {{ request()->routeIs('user.panen*') ? 'bg-[#2c5e4e] text-white' : 'hover:bg-[#eaf4f1] hover:text-[#2c5e4e]' }}">
+                            <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M7 21h10M12 3v18M5 8h14M6 3h12a1 1 0 011 1v4H5V4a1 1 0 011-1z"/>
+                            </svg>
+                            <span>Input Panen</span>
+                        </a>
+                        <a href="{{ route('pengajuan.index') }}" class="nav-item flex items-center gap-3 px-4 py-2.5 rounded-xl text-gray-700 font-medium transition-all duration-200 {{ request()->routeIs('pengajuan*') ? 'bg-[#2c5e4e] text-white' : 'hover:bg-[#eaf4f1] hover:text-[#2c5e4e]' }}">
+                            <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                            </svg>
+                            <span>Izin / Sakit</span>
+                        </a>
                         <a href="{{ route('rapot.user') }}" class="nav-item flex items-center gap-3 px-4 py-2.5 rounded-xl text-gray-700 font-medium transition-all duration-200 {{ request()->routeIs('rapot.user') ? 'bg-[#2c5e4e] text-white' : 'hover:bg-[#eaf4f1] hover:text-[#2c5e4e]' }}">
                             <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
                             <span>Rapot Saya</span>
@@ -164,77 +196,76 @@ class="nav-item flex items-center gap-3 px-4 py-2.5 rounded-xl text-gray-700 fon
                         </a>
                         @break
                         
-                  @case('security')
+                    @case('security')
+                    @case('cleaning')
+                    @case('kantoran')
+                    @case('mandor')
+                        <a href="{{ route(Auth::user()->role . '.dashboard') }}" class="nav-item flex items-center gap-3 px-4 py-2.5 rounded-xl text-gray-700 font-medium transition-all duration-200 {{ request()->routeIs(Auth::user()->role . '.dashboard') ? 'bg-[#2c5e4e] text-white' : 'hover:bg-[#eaf4f1] hover:text-[#2c5e4e]' }}">
+                            <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/>
+                            </svg>
+                            <span>Dashboard</span>
+                        </a>
 
-@case('cleaning')
-@case('kantoran')
+                        <a href="{{ route('attendance.history') }}" class="nav-item flex items-center gap-3 px-4 py-2.5 rounded-xl text-gray-700 font-medium transition-all duration-200 {{ request()->routeIs('attendance.history') ? 'bg-[#2c5e4e] text-white' : 'hover:bg-[#eaf4f1] hover:text-[#2c5e4e]' }}">
+                            <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                            </svg>
+                            <span>Riwayat Absen</span>
+                        </a>
 
-    <a href="{{ route(Auth::user()->role . '.dashboard') }}" 
-       class="nav-item flex items-center gap-3 px-4 py-2.5 rounded-xl text-gray-700 font-medium transition-all duration-200 {{ request()->routeIs(Auth::user()->role . '.dashboard') ? 'bg-[#2c5e4e] text-white' : 'hover:bg-[#eaf4f1] hover:text-[#2c5e4e]' }}">
-        <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8"
-                d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/>
-        </svg>
-        <span>Dashboard</span>
-    </a>
+                        {{-- MENU PENGAJUAN IZIN/SAKIT (UNTUK SEMUA ROLE KECUALI ADMIN & MANAGER) --}}
+                        <a href="{{ route('pengajuan.index') }}" class="nav-item flex items-center gap-3 px-4 py-2.5 rounded-xl text-gray-700 font-medium transition-all duration-200 {{ request()->routeIs('pengajuan*') ? 'bg-[#2c5e4e] text-white' : 'hover:bg-[#eaf4f1] hover:text-[#2c5e4e]' }}">
+                            <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                            </svg>
+                            <span>Izin / Sakit</span>
+                        </a>
 
-    <a href="{{ route('attendance.history') }}" 
-       class="nav-item flex items-center gap-3 px-4 py-2.5 rounded-xl text-gray-700 font-medium transition-all duration-200 {{ request()->routeIs('attendance.history') ? 'bg-[#2c5e4e] text-white' : 'hover:bg-[#eaf4f1] hover:text-[#2c5e4e]' }}">
-        <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8"
-                d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
-        </svg>
-        <span>Riwayat Absen</span>
-    </a>
-    {{-- KHUSUS SECURITY --}}
-@if(Auth::user()->role == 'security')
+                        {{-- KHUSUS MANDOR --}}
+                        @if(Auth::user()->role == 'mandor')
+                            <a href="{{ route('mandor.panen') }}" class="nav-item flex items-center gap-3 px-4 py-2.5 rounded-xl text-gray-700 font-medium transition-all duration-200 {{ request()->routeIs('mandor.panen') ? 'bg-[#2c5e4e] text-white' : 'hover:bg-[#eaf4f1] hover:text-[#2c5e4e]' }}">
+                                <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                                </svg>
+                                <span>Laporan Panen</span>
+                            </a>
+                        @endif
 
-    <a href="{{ route('security.patroli') }}" 
-       class="nav-item flex items-center gap-3 px-4 py-2.5 rounded-xl text-gray-700 font-medium transition-all duration-200 {{ request()->routeIs('security.patroli') ? 'bg-[#2c5e4e] text-white' : 'hover:bg-[#eaf4f1] hover:text-[#2c5e4e]' }}">
+                        {{-- KHUSUS SECURITY --}}
+                        @if(Auth::user()->role == 'security')
+                            <a href="{{ route('security.patroli') }}" class="nav-item flex items-center gap-3 px-4 py-2.5 rounded-xl text-gray-700 font-medium transition-all duration-200 {{ request()->routeIs('security.patroli') ? 'bg-[#2c5e4e] text-white' : 'hover:bg-[#eaf4f1] hover:text-[#2c5e4e]' }}">
+                                <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 01.553-.894L9 2m0 18l6-2m-6 2V2m6 16l5.447-2.724A1 1 0 0021 14.382V3.618a1 1 0 00-.553-.894L15 0m0 18V0"/>
+                                </svg>
+                                <span>Patroli</span>
+                            </a>
+                        @endif
 
-        <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8"
-                d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 01.553-.894L9 2m0 18l6-2m-6 2V2m6 16l5.447-2.724A1 1 0 0021 14.382V3.618a1 1 0 00-.553-.894L15 0m0 18V0"/>
-        </svg>
+                        {{-- KHUSUS CLEANING --}}
+                        @if(Auth::user()->role == 'cleaning')
+                            <a href="{{ route('cleaning.kinerja') }}" class="nav-item flex items-center gap-3 px-4 py-2.5 rounded-xl text-gray-700 font-medium transition-all duration-200 {{ request()->routeIs('cleaning.kinerja') ? 'bg-[#2c5e4e] text-white' : 'hover:bg-[#eaf4f1] hover:text-[#2c5e4e]' }}">
+                                <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M3 7h18M3 12h18M3 17h18"/>
+                                </svg>
+                                <span>Input Kinerja</span>
+                            </a>
+                        @endif
 
-        <span>Patroli</span>
-    </a>
+                        <a href="{{ route('rapot.user') }}" class="nav-item flex items-center gap-3 px-4 py-2.5 rounded-xl text-gray-700 font-medium transition-all duration-200 {{ request()->routeIs('rapot.user') ? 'bg-[#2c5e4e] text-white' : 'hover:bg-[#eaf4f1] hover:text-[#2c5e4e]' }}">
+                            <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                            </svg>
+                            <span>Rapot</span>
+                        </a>
 
-@endif
-
-    {{-- KHUSUS CLEANING --}}
-    @if(Auth::user()->role == 'cleaning')
-        <a href="{{ route('cleaning.kinerja') }}" 
-           class="nav-item flex items-center gap-3 px-4 py-2.5 rounded-xl text-gray-700 font-medium transition-all duration-200 {{ request()->routeIs('cleaning.kinerja') ? 'bg-[#2c5e4e] text-white' : 'hover:bg-[#eaf4f1] hover:text-[#2c5e4e]' }}">
-            
-            <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8"
-                    d="M3 7h18M3 12h18M3 17h18"/>
-            </svg>
-
-            <span>Input Kinerja</span>
-        </a>
-    @endif
-
-    <a href="{{ route('rapot.user') }}" 
-       class="nav-item flex items-center gap-3 px-4 py-2.5 rounded-xl text-gray-700 font-medium transition-all duration-200 {{ request()->routeIs('rapot.user') ? 'bg-[#2c5e4e] text-white' : 'hover:bg-[#eaf4f1] hover:text-[#2c5e4e]' }}">
-        <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8"
-                d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
-        </svg>
-        <span>Rapot</span>
-    </a>
-
-    <a href="{{ route('pengumuman.user') }}" 
-       class="nav-item flex items-center gap-3 px-4 py-2.5 rounded-xl text-gray-700 font-medium transition-all duration-200 {{ request()->routeIs('pengumuman.user') ? 'bg-[#2c5e4e] text-white' : 'hover:bg-[#eaf4f1] hover:text-[#2c5e4e]' }}">
-        <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8"
-                d="M11 5.882V19.24a1.76 1.76 0 01-3.417.592l-2.147-6.15M18 13a3 3 0 100-6M5.436 13.683A4.001 4.001 0 017 6h1.832c4.1 0 7.625-1.234 9.168-3v14c-1.543-1.766-5.067-3-9.168-3H7a3.988 0 01-1.564-.317z"/>
-        </svg>
-        <span>Pengumuman</span>
-    </a>
-
-    @break
+                        <a href="{{ route('pengumuman.user') }}" class="nav-item flex items-center gap-3 px-4 py-2.5 rounded-xl text-gray-700 font-medium transition-all duration-200 {{ request()->routeIs('pengumuman.user') ? 'bg-[#2c5e4e] text-white' : 'hover:bg-[#eaf4f1] hover:text-[#2c5e4e]' }}">
+                            <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M11 5.882V19.24a1.76 1.76 0 01-3.417.592l-2.147-6.15M18 13a3 3 0 100-6M5.436 13.683A4.001 4.001 0 017 6h1.832c4.1 0 7.625-1.234 9.168-3v14c-1.543-1.766-5.067-3-9.168-3H7a3.988 3.988 0 01-1.564-.317z"/>
+                            </svg>
+                            <span>Pengumuman</span>
+                        </a>
+                        @break
                 @endswitch
             @endauth
         </nav>

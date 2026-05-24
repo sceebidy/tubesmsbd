@@ -24,6 +24,7 @@ class DatabaseSeeder extends Seeder
 
         // Multiple users
         $users = [
+
             [
                 'name'     => 'Admin User',
                 'email'    => 'admin@gmail.com',
@@ -31,6 +32,7 @@ class DatabaseSeeder extends Seeder
                 'role'     => 'admin',
                 'password' => Hash::make('12345678'),
             ],
+
             [
                 'name'     => 'Regular User',
                 'email'    => 'user@gmail.com',
@@ -38,6 +40,7 @@ class DatabaseSeeder extends Seeder
                 'role'     => 'user',
                 'password' => Hash::make('12345678'),
             ],
+
             [
                 'name'     => 'Manager User',
                 'email'    => 'manager@gmail.com',
@@ -45,6 +48,7 @@ class DatabaseSeeder extends Seeder
                 'role'     => 'manager',
                 'password' => Hash::make('12345678'),
             ],
+
             [
                 'name'     => 'Security User',
                 'email'    => 'security@gmail.com',
@@ -52,6 +56,7 @@ class DatabaseSeeder extends Seeder
                 'role'     => 'security',
                 'password' => Hash::make('12345678'),
             ],
+
             [
                 'name'     => 'Cleaning User',
                 'email'    => 'cleaning@gmail.com',
@@ -59,6 +64,7 @@ class DatabaseSeeder extends Seeder
                 'role'     => 'cleaning',
                 'password' => Hash::make('12345678'),
             ],
+
             [
                 'name'     => 'Kantoran User',
                 'email'    => 'kantoran@gmail.com',
@@ -66,6 +72,16 @@ class DatabaseSeeder extends Seeder
                 'role'     => 'kantoran',
                 'password' => Hash::make('12345678'),
             ],
+
+            // TAMBAHAN ROLE MANDOR
+            [
+                'name'     => 'Mandor User',
+                'email'    => 'mandor@gmail.com',
+                'no_hp'    => '088888888888',
+                'role'     => 'mandor',
+                'password' => Hash::make('12345678'),
+            ],
+
         ];
 
         foreach ($users as $user) {

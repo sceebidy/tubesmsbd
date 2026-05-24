@@ -115,7 +115,6 @@ class Attendance extends Model
         */
         'date' => 'date',
 
-        // DISARANKAN DATABASE DATETIME
         'check_in' => 'datetime',
         'check_out' => 'datetime',
 
@@ -161,10 +160,24 @@ class Attendance extends Model
 
         'working_hours',
         'status_color',
+        'status_label',
 
         'short_checkin_address',
         'short_checkout_address',
     ];
+
+    /*
+    |--------------------------------------------------------------------------
+    | CONSTANTS
+    |--------------------------------------------------------------------------
+    */
+
+    // Status kehadiran
+    const STATUS_HADIR = 'hadir';
+    const STATUS_TERLAMBAT = 'terlambat';
+    const STATUS_IZIN = 'izin';
+    const STATUS_SAKIT = 'sakit';
+    const STATUS_ALPA = 'alpa';
 
     /*
     |--------------------------------------------------------------------------
@@ -177,10 +190,7 @@ class Attendance extends Model
      */
     public function user()
     {
-        return $this->belongsTo(
-            User::class,
-            'user_id'
-        );
+        return $this->belongsTo(User::class, 'user_id');
     }
 
     /**
@@ -188,14 +198,8 @@ class Attendance extends Model
      */
     public function panen()
     {
-        return $this->hasOne(
-            CatatanPanen::class,
-            'id_pegawai',
-            'user_id'
-        )->whereDate(
-            'tanggal',
-            optional($this->date)->toDateString()
-        );
+        return $this->hasOne(CatatanPanen::class, 'id_pegawai', 'user_id')
+            ->whereDate('tanggal', optional($this->date)->toDateString());
     }
 
     /**
@@ -203,14 +207,8 @@ class Attendance extends Model
      */
     public function catatanPanen()
     {
-        return $this->hasOne(
-            CatatanPanen::class,
-            'id_pegawai',
-            'user_id'
-        )->where(
-            'tanggal',
-            optional($this->date)->toDateString()
-        );
+        return $this->hasOne(CatatanPanen::class, 'id_pegawai', 'user_id')
+            ->where('tanggal', optional($this->date)->toDateString());
     }
 
     /*
@@ -244,10 +242,7 @@ class Attendance extends Model
      */
     public function getCheckinMapsUrlAttribute()
     {
-        if (
-            is_null($this->checkin_latitude) ||
-            is_null($this->checkin_longitude)
-        ) {
+        if (is_null($this->checkin_latitude) || is_null($this->checkin_longitude)) {
             return null;
         }
 
@@ -261,10 +256,7 @@ class Attendance extends Model
      */
     public function getCheckoutMapsUrlAttribute()
     {
-        if (
-            is_null($this->checkout_latitude) ||
-            is_null($this->checkout_longitude)
-        ) {
+        if (is_null($this->checkout_latitude) || is_null($this->checkout_longitude)) {
             return null;
         }
 
@@ -283,17 +275,12 @@ class Attendance extends Model
         }
 
         $checkIn = Carbon::parse($this->check_in);
-
         $checkOut = Carbon::parse($this->check_out);
-
         $minutes = $checkIn->diffInMinutes($checkOut);
-
         $hours = floor($minutes / 60);
-
         $remainingMinutes = $minutes % 60;
 
-        return $hours . ' jam ' .
-               $remainingMinutes . ' menit';
+        return $hours . ' jam ' . $remainingMinutes . ' menit';
     }
 
     /**
@@ -301,16 +288,15 @@ class Attendance extends Model
      */
     public function getStatusColorAttribute()
     {
-        return match ($this->status) {
+        return $this->getStatusBadgeColor();
+    }
 
-            'tepat waktu' => 'green',
-
-            'hadir' => 'green',
-
-            'terlambat' => 'yellow',
-
-            default => 'gray',
-        };
+    /**
+     * Label status
+     */
+    public function getStatusLabelAttribute()
+    {
+        return self::getStatuses()[$this->status] ?? ucfirst($this->status);
     }
 
     /**
@@ -322,10 +308,7 @@ class Attendance extends Model
             return '-';
         }
 
-        return explode(
-            ',',
-            $this->checkin_address
-        )[0];
+        return explode(',', $this->checkin_address)[0];
     }
 
     /**
@@ -337,10 +320,7 @@ class Attendance extends Model
             return '-';
         }
 
-        return explode(
-            ',',
-            $this->checkout_address
-        )[0];
+        return explode(',', $this->checkout_address)[0];
     }
 
     /*
@@ -348,6 +328,52 @@ class Attendance extends Model
     | HELPER METHODS
     |--------------------------------------------------------------------------
     */
+
+    /**
+     * Mendapatkan semua status yang tersedia
+     */
+    public static function getStatuses()
+    {
+        return [
+            self::STATUS_HADIR => 'Hadir',
+            self::STATUS_TERLAMBAT => 'Terlambat',
+            self::STATUS_IZIN => 'Izin',
+            self::STATUS_SAKIT => 'Sakit',
+            self::STATUS_ALPA => 'Alpa',
+        ];
+    }
+
+    /**
+     * Mendapatkan warna badge untuk status
+     */
+    public function getStatusBadgeColor()
+    {
+        return match ($this->status) {
+            self::STATUS_HADIR => 'green',
+            self::STATUS_TERLAMBAT => 'yellow',
+            self::STATUS_IZIN => 'blue',
+            self::STATUS_SAKIT => 'purple',
+            self::STATUS_ALPA => 'gray',
+            default => 'gray',
+        };
+    }
+
+    /**
+     * Mendapatkan class CSS untuk badge
+     */
+    public function getStatusBadgeClass()
+    {
+        $color = $this->getStatusBadgeColor();
+        
+        return match ($color) {
+            'green' => 'bg-green-100 text-green-700',
+            'yellow' => 'bg-yellow-100 text-yellow-700',
+            'blue' => 'bg-blue-100 text-blue-700',
+            'purple' => 'bg-purple-100 text-purple-700',
+            'gray' => 'bg-gray-100 text-gray-600',
+            default => 'bg-gray-100 text-gray-700',
+        };
+    }
 
     /**
      * Sudah check in
@@ -370,8 +396,7 @@ class Attendance extends Model
      */
     public function hasCheckinLocation()
     {
-        return !is_null($this->checkin_latitude) &&
-               !is_null($this->checkin_longitude);
+        return !is_null($this->checkin_latitude) && !is_null($this->checkin_longitude);
     }
 
     /**
@@ -379,8 +404,7 @@ class Attendance extends Model
      */
     public function hasCheckoutLocation()
     {
-        return !is_null($this->checkout_latitude) &&
-               !is_null($this->checkout_longitude);
+        return !is_null($this->checkout_latitude) && !is_null($this->checkout_longitude);
     }
 
     /**
@@ -388,7 +412,7 @@ class Attendance extends Model
      */
     public function isLate()
     {
-        return $this->status === 'terlambat';
+        return $this->status === self::STATUS_TERLAMBAT;
     }
 
     /**
@@ -396,9 +420,87 @@ class Attendance extends Model
      */
     public function isOnTime()
     {
-        return in_array(
-            $this->status,
-            ['hadir', 'tepat waktu']
-        );
+        return $this->status === self::STATUS_HADIR;
+    }
+
+    /**
+     * Apakah alpa
+     */
+    public function isAbsent()
+    {
+        return $this->status === self::STATUS_ALPA;
+    }
+
+    /**
+     * Apakah izin
+     */
+    public function isPermit()
+    {
+        return $this->status === self::STATUS_IZIN;
+    }
+
+    /**
+     * Apakah sakit
+     */
+    public function isSick()
+    {
+        return $this->status === self::STATUS_SAKIT;
+    }
+
+    /**
+     * Scope untuk kehadiran hari ini
+     */
+    public function scopeToday($query)
+    {
+        return $query->whereDate('date', Carbon::today('Asia/Jakarta'));
+    }
+
+    /**
+     * Scope untuk bulan ini
+     */
+    public function scopeThisMonth($query)
+    {
+        return $query->whereMonth('date', Carbon::now('Asia/Jakarta')->month)
+                     ->whereYear('date', Carbon::now('Asia/Jakarta')->year);
+    }
+
+    /**
+     * Scope untuk status hadir
+     */
+    public function scopeHadir($query)
+    {
+        return $query->where('status', self::STATUS_HADIR);
+    }
+
+    /**
+     * Scope untuk status terlambat
+     */
+    public function scopeTerlambat($query)
+    {
+        return $query->where('status', self::STATUS_TERLAMBAT);
+    }
+
+    /**
+     * Scope untuk status alpa
+     */
+    public function scopeAlpa($query)
+    {
+        return $query->where('status', self::STATUS_ALPA);
+    }
+
+    /**
+     * Scope untuk status izin
+     */
+    public function scopeIzin($query)
+    {
+        return $query->where('status', self::STATUS_IZIN);
+    }
+
+    /**
+     * Scope untuk status sakit
+     */
+    public function scopeSakit($query)
+    {
+        return $query->where('status', self::STATUS_SAKIT);
     }
 }

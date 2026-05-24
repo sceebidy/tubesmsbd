@@ -4,9 +4,7 @@
 <div class="min-h-screen bg-[#F8FAF9] p-4 md:p-8">
     <div class="container mx-auto max-w-6xl px-2 sm:px-6">
 
-        {{-- ============================================================ --}}
         {{-- HEADER --}}
-        {{-- ============================================================ --}}
         <div class="mb-6 md:mb-8 pb-4 md:pb-5 border-b border-[#E2E8F0]">
             <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
                 <div class="flex items-center gap-3 md:gap-4">
@@ -22,15 +20,13 @@
                 </div>
                 <div class="flex items-center gap-4">
                     <div class="text-right">
-                        <p class="text-xs md:text-sm text-gray-500">{{ now()->translatedFormat('l, j F Y') }}</p>
+                        <p class="text-xs md:text-sm text-gray-500">{{ now('Asia/Jakarta')->translatedFormat('l, j F Y') }}</p>
                     </div>
                 </div>
             </div>
         </div>
 
-        {{-- ============================================================ --}}
         {{-- ALERT MESSAGES --}}
-        {{-- ============================================================ --}}
         @if(session('success'))
         <div class="mb-4 md:mb-5 p-3 md:p-4 rounded-xl bg-[#e8f5f0] border border-[#2e7d5e]/20 flex items-center gap-3">
             <svg class="w-5 h-5 text-[#2e7d5e] flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -49,11 +45,90 @@
         </div>
         @endif
 
-        {{-- ============================================================ --}}
-        {{-- STAT CARDS (Balanced) --}}
-        {{-- ============================================================ --}}
+        @if(session('warning'))
+        <div class="mb-4 md:mb-5 p-3 md:p-4 rounded-xl bg-amber-50 border border-amber-200 flex items-center gap-3">
+            <svg class="w-5 h-5 text-amber-600 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
+            </svg>
+            <p class="text-sm md:text-base text-amber-800">{!! session('warning') !!}</p>
+        </div>
+        @endif
+
+        {{-- CEK STATUS UNTUK SEMUA ROLE --}}
+        @php
+            $today = \Carbon\Carbon::today('Asia/Jakarta');
+            $canCheckout = true;
+            $checkoutWarningMessage = '';
+            $checkoutRedirectRoute = null;
+            $checkoutRedirectText = '';
+            
+            switch(Auth::user()->role) {
+                case 'user':
+                    $hasRequired = \App\Models\LaporanPanen::where('pekerja_id', Auth::id())
+                        ->whereDate('tanggal', $today)
+                        ->exists();
+                    if (!$hasRequired) {
+                        $canCheckout = false;
+                        $checkoutWarningMessage = 'Anda harus menginput panen terlebih dahulu sebelum checkout.';
+                        $checkoutRedirectRoute = route('user.panen');
+                        $checkoutRedirectText = 'Input Panen Sawit';
+                    }
+                    break;
+                    
+                case 'cleaning':
+                    $hasRequired = \App\Models\KinerjaCleaning::where('user_id', Auth::id())
+                        ->whereDate('tanggal', $today)
+                        ->exists();
+                    if (!$hasRequired) {
+                        $canCheckout = false;
+                        $checkoutWarningMessage = 'Anda harus menginput kinerja cleaning terlebih dahulu sebelum checkout.';
+                        $checkoutRedirectRoute = route('cleaning.kinerja');
+                        $checkoutRedirectText = 'Input Kinerja Cleaning';
+                    }
+                    break;
+                    
+                case 'security':
+                    $hasRequired = \App\Models\PatroliSecurity::where('user_id', Auth::id())
+                        ->whereDate('created_at', $today)
+                        ->exists();
+                    if (!$hasRequired) {
+                        $canCheckout = false;
+                        $checkoutWarningMessage = 'Anda harus menginput laporan patroli terlebih dahulu sebelum checkout.';
+                        $checkoutRedirectRoute = route('security.patroli');
+                        $checkoutRedirectText = 'Input Patroli';
+                    }
+                    break;
+                    
+              case 'mandor':
+    $pekerjaList = \App\Models\User::where('mandor_id', Auth::id())
+        ->where('role', 'user')
+        ->get();
+    
+    if($pekerjaList->count() > 0) {
+        // CEK APAKAH MANDOR SUDAH VERIFIKASI LAPORAN PANEN
+        $sudahVerifikasi = \App\Models\LaporanPanen::where('mandor_id', Auth::id())
+            ->whereDate('tanggal', $today)
+            ->where('status', 'diverifikasi_mandor')
+            ->exists();
+        
+        if (!$sudahVerifikasi) {
+            $canCheckout = false;
+            $checkoutWarningMessage = 'Anda harus memverifikasi laporan panen terlebih dahulu sebelum checkout.';
+            $checkoutRedirectRoute = route('mandor.panen');
+            $checkoutRedirectText = 'Verifikasi Laporan Panen';
+        }
+    }
+    break;
+                    
+                case 'kantoran':
+                    // Staff kantor tidak ada kewajiban tambahan
+                    $canCheckout = true;
+                    break;
+            }
+        @endphp
+
+        {{-- STAT CARDS --}}
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-5 mb-6 md:mb-8">
-            {{-- Card 1: Status Hari Ini --}}
             <div class="bg-white rounded-xl md:rounded-2xl p-4 md:p-5 border border-[#E2E8F0] shadow-sm hover:shadow-md transition-all duration-200">
                 <div class="flex items-start justify-between">
                     <div class="flex-1 min-w-0">
@@ -64,7 +139,7 @@
                             @elseif(!$attendanceToday->check_out)
                                 Sedang Bekerja
                             @else
-                                Selesai ✓
+                                Selesai
                             @endif
                         </p>
                     </div>
@@ -97,7 +172,6 @@
                 </div>
             </div>
 
-            {{-- Card 2: Kehadiran Bulan Ini --}}
             <div class="bg-white rounded-xl md:rounded-2xl p-4 md:p-5 border border-[#E2E8F0] shadow-sm hover:shadow-md transition-all duration-200">
                 <div class="flex items-start justify-between">
                     <div class="flex-1 min-w-0">
@@ -112,25 +186,55 @@
                 </div>
             </div>
 
-            {{-- Card 3: Total Sawit (khusus user) --}}
             @if(Auth::user()->role == 'user')
             <div class="bg-white rounded-xl md:rounded-2xl p-4 md:p-5 border border-[#E2E8F0] shadow-sm hover:shadow-md transition-all duration-200">
                 <div class="flex items-start justify-between">
                     <div class="flex-1 min-w-0">
-                        <p class="text-xs font-medium text-gray-500 uppercase tracking-wide">Total Sawit</p>
-                        <p class="text-2xl md:text-3xl font-bold text-gray-800 mt-1">{{ number_format($monthlyPalmWeight, 1) }} <span class="text-sm md:text-base font-normal text-gray-500">KG</span></p>
+                        <p class="text-xs font-medium text-gray-500 uppercase tracking-wide">Panen Bulan Ini</p>
+                        <p class="text-xl md:text-2xl font-bold text-[#2c5e4e] mt-1">{{ number_format($monthlyPalmWeight ?? 0, 1) }} <span class="text-sm md:text-base font-normal text-gray-500">Kg</span></p>
                     </div>
-                    <div class="w-10 h-10 md:w-12 md:h-12 rounded-xl bg-[#fef5ed] flex items-center justify-center flex-shrink-0 ml-3">
-                        <svg class="w-5 h-5 md:w-6 md:h-6 text-[#d4a373]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"></path>
+                    <div class="w-10 h-10 md:w-12 md:h-12 rounded-xl bg-[#eaf4f1] flex items-center justify-center flex-shrink-0 ml-3">
+                        <svg class="w-5 h-5 md:w-6 md:h-6 text-[#2c5e4e]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path>
                         </svg>
                     </div>
                 </div>
             </div>
             @endif
 
-            {{-- Card 4: Jam Sekarang (menyesuaikan jika ada card sawit) --}}
-            <div class="{{ Auth::user()->role == 'user' ? '' : 'sm:col-span-2 lg:col-span-1' }} bg-[#2c5e4e] rounded-xl md:rounded-2xl p-4 md:p-5 shadow-sm hover:shadow-md transition-all duration-200">
+            @if(Auth::user()->role == 'cleaning')
+            <div class="bg-white rounded-xl md:rounded-2xl p-4 md:p-5 border border-[#E2E8F0] shadow-sm hover:shadow-md transition-all duration-200">
+                <div class="flex items-start justify-between">
+                    <div class="flex-1 min-w-0">
+                        <p class="text-xs font-medium text-gray-500 uppercase tracking-wide">Kinerja Hari Ini</p>
+                        <p class="text-xl md:text-2xl font-bold text-[#2c5e4e] mt-1">{{ $totalKinerjaHariIni ?? 0 }} <span class="text-sm md:text-base font-normal text-gray-500">Area</span></p>
+                    </div>
+                    <div class="w-10 h-10 md:w-12 md:h-12 rounded-xl bg-[#eaf4f1] flex items-center justify-center flex-shrink-0 ml-3">
+                        <svg class="w-5 h-5 md:w-6 md:h-6 text-[#2c5e4e]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"></path>
+                        </svg>
+                    </div>
+                </div>
+            </div>
+            @endif
+
+            @if(Auth::user()->role == 'security')
+            <div class="bg-white rounded-xl md:rounded-2xl p-4 md:p-5 border border-[#E2E8F0] shadow-sm hover:shadow-md transition-all duration-200">
+                <div class="flex items-start justify-between">
+                    <div class="flex-1 min-w-0">
+                        <p class="text-xs font-medium text-gray-500 uppercase tracking-wide">Patroli Hari Ini</p>
+                        <p class="text-xl md:text-2xl font-bold text-[#2c5e4e] mt-1">{{ $totalPatroliHariIni ?? 0 }} <span class="text-sm md:text-base font-normal text-gray-500">Laporan</span></p>
+                    </div>
+                    <div class="w-10 h-10 md:w-12 md:h-12 rounded-xl bg-[#eaf4f1] flex items-center justify-center flex-shrink-0 ml-3">
+                        <svg class="w-5 h-5 md:w-6 md:h-6 text-[#2c5e4e]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path>
+                        </svg>
+                    </div>
+                </div>
+            </div>
+            @endif
+
+            <div class="bg-[#2c5e4e] rounded-xl md:rounded-2xl p-4 md:p-5 shadow-sm hover:shadow-md transition-all duration-200">
                 <div class="flex items-start justify-between">
                     <div class="flex-1 min-w-0">
                         <p class="text-xs font-medium text-white/70 uppercase tracking-wide">Jam Sekarang</p>
@@ -145,9 +249,7 @@
             </div>
         </div>
 
-        {{-- ============================================================ --}}
         {{-- TAB NAVIGATION --}}
-        {{-- ============================================================ --}}
         <div class="flex gap-2 bg-white border border-[#E2E8F0] rounded-full p-1 w-fit mb-6 shadow-sm">
             <button onclick="showTab('today')" id="tab-today-btn" class="tab-btn px-4 md:px-6 py-2 rounded-full text-sm font-semibold transition-all duration-200 bg-[#2c5e4e] text-white shadow-md whitespace-nowrap">
                 Status Hari Ini
@@ -157,9 +259,7 @@
             </button>
         </div>
 
-        {{-- ============================================================ --}}
         {{-- TAB: STATUS HARI INI --}}
-        {{-- ============================================================ --}}
         <div id="tab-today" class="tab-content">
             <div class="bg-white rounded-xl md:rounded-2xl shadow-sm border border-[#E2E8F0] overflow-hidden">
                 <div class="px-4 md:px-7 py-4 md:py-5 border-b border-[#eaf4f1] flex items-center gap-3">
@@ -171,7 +271,6 @@
                 <div class="p-4 md:p-7">
                     @if($attendanceToday)
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
-                        {{-- CHECK IN --}}
                         <div class="bg-[#e8f5f0] rounded-xl p-4 md:p-6 border border-[#2e7d5e]/20">
                             <div class="flex items-center gap-3 mb-4">
                                 <div class="w-8 h-8 md:w-10 md:h-10 rounded-full bg-[#2e7d5e]/20 flex items-center justify-center flex-shrink-0">
@@ -184,18 +283,14 @@
                             <div class="space-y-3">
                                 <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center py-2 border-b border-[#2e7d5e]/10 gap-1">
                                     <span class="text-xs md:text-sm text-gray-600">Jam Masuk</span>
-                                    <span class="font-semibold text-gray-800 text-sm md:text-base">{{ $attendanceToday->check_in ? $attendanceToday->check_in->format('H:i:s') : '—' }}</span>
+                                    <span class="font-semibold text-gray-800 text-sm md:text-base">{{ $attendanceToday->check_in ? \Carbon\Carbon::parse($attendanceToday->check_in)->format('H:i:s') : '—' }}</span>
                                 </div>
                                 <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center py-2 border-b border-[#2e7d5e]/10 gap-1">
                                     <span class="text-xs md:text-sm text-gray-600">Status</span>
                                     <span class="px-2 md:px-3 py-1 rounded-full text-xs font-semibold w-fit
-                                        {{ $attendanceToday->status == 'hadir' ? 'bg-[#e8f5f0] text-[#2e7d5e]' : ($attendanceToday->status == 'telat' ? 'bg-[#FDECEA] text-[#C0392B]' : 'bg-[#fef5ed] text-[#d4a373]') }}">
+                                        {{ $attendanceToday->status == 'tepat waktu' ? 'bg-[#e8f5f0] text-[#2e7d5e]' : 'bg-[#FDECEA] text-[#C0392B]' }}">
                                         {{ ucfirst($attendanceToday->status) }}
                                     </span>
-                                </div>
-                                <div class="py-2">
-                                    <span class="text-xs md:text-sm text-gray-600 block mb-1">Lokasi</span>
-                                    <p class="text-xs md:text-sm text-gray-700 bg-white/60 rounded-lg p-2 break-words">{{ $attendanceToday->checkin_address ?? '—' }}</p>
                                 </div>
                                 @if($attendanceToday->photo_path)
                                 <div>
@@ -206,7 +301,6 @@
                             </div>
                         </div>
 
-                        {{-- CHECK OUT --}}
                         <div class="bg-[#eaf4f1] rounded-xl p-4 md:p-6 border border-[#2c5e4e]/20">
                             <div class="flex items-center gap-3 mb-4">
                                 <div class="w-8 h-8 md:w-10 md:h-10 rounded-full bg-[#2c5e4e]/20 flex items-center justify-center flex-shrink-0">
@@ -220,18 +314,14 @@
                             <div class="space-y-3">
                                 <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center py-2 border-b border-[#2c5e4e]/10 gap-1">
                                     <span class="text-xs md:text-sm text-gray-600">Jam Pulang</span>
-                                    <span class="font-semibold text-gray-800 text-sm md:text-base">{{ $attendanceToday->check_out->format('H:i:s') }}</span>
+                                    <span class="font-semibold text-gray-800 text-sm md:text-base">{{ \Carbon\Carbon::parse($attendanceToday->check_out)->format('H:i:s') }}</span>
                                 </div>
                                 @if(Auth::user()->role == 'user')
                                 <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center py-2 border-b border-[#2c5e4e]/10 gap-1">
-                                    <span class="text-xs md:text-sm text-gray-600">Berat Sawit</span>
-                                    <span class="font-semibold text-gray-800 text-sm md:text-base">{{ number_format($attendanceToday->palm_weight, 1) }} KG</span>
+                                    <span class="text-xs md:text-sm text-gray-600">Panen Hari Ini</span>
+                                    <span class="font-semibold text-[#2c5e4e] text-sm md:text-base">{{ number_format($todayPalmWeight ?? 0, 2) }} Kg</span>
                                 </div>
                                 @endif
-                                <div class="py-2">
-                                    <span class="text-xs md:text-sm text-gray-600 block mb-1">Lokasi</span>
-                                    <p class="text-xs md:text-sm text-gray-700 bg-white/60 rounded-lg p-2 break-words">{{ $attendanceToday->checkout_address ?? '—' }}</p>
-                                </div>
                                 @if($attendanceToday->checkout_photo_path)
                                 <div>
                                     <span class="text-xs md:text-sm text-gray-600 block mb-1">Foto</span>
@@ -265,9 +355,7 @@
             </div>
         </div>
 
-        {{-- ============================================================ --}}
-        {{-- TAB: FORM ABSENSI --}}
-        {{-- ============================================================ --}}
+        {{-- TAB: FORM ABSENSI DENGAN LIVE CAMERA --}}
         <div id="tab-absen" class="tab-content hidden">
             <div class="bg-white rounded-xl md:rounded-2xl shadow-sm border border-[#E2E8F0] overflow-hidden">
                 <div class="px-4 md:px-7 py-4 md:py-5 border-b border-[#eaf4f1] flex items-center gap-3">
@@ -291,7 +379,6 @@
                     <form action="{{ route('attendance.store') }}" method="POST" id="checkinForm">
                         @csrf
 
-                        {{-- Camera --}}
                         <div class="mb-5">
                             <label class="block text-sm font-semibold text-gray-700 mb-2">
                                 <span class="flex items-center gap-2">
@@ -302,17 +389,17 @@
                                     Foto Check In
                                 </span>
                             </label>
-                          <div id="cameraContainer" class="relative rounded-xl overflow-hidden bg-gray-900 w-full md:max-w-2xl mx-auto">
-    <video id="camera" autoplay playsinline class="w-full h-auto md:h-[480px] object-cover"></video>
-    <canvas id="canvas" class="hidden"></canvas>
-    <button type="button" onclick="captureCheckinPhoto()" class="absolute bottom-4 left-1/2 -translate-x-1/2 bg-white/95 hover:bg-white text-[#2c5e4e] font-semibold px-5 md:px-7 py-2 md:py-2.5 rounded-full shadow-lg transition-all text-sm md:text-base whitespace-nowrap flex items-center gap-2">
-        <svg class="w-5 h-5 md:w-6 md:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"></path>
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"></path>
-        </svg>
-        Ambil Foto
-    </button>
-</div>
+                            <div id="cameraContainer" class="relative rounded-xl overflow-hidden bg-gray-900 w-full md:max-w-2xl mx-auto">
+                                <video id="camera" autoplay playsinline class="w-full h-auto md:h-[400px] object-cover"></video>
+                                <canvas id="canvas" class="hidden"></canvas>
+                                <button type="button" onclick="captureCheckinPhoto()" class="absolute bottom-4 left-1/2 -translate-x-1/2 bg-white/95 hover:bg-white text-[#2c5e4e] font-semibold px-5 md:px-7 py-2 md:py-2.5 rounded-full shadow-lg transition-all text-sm md:text-base whitespace-nowrap flex items-center gap-2">
+                                    <svg class="w-5 h-5 md:w-6 md:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"></path>
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                                    </svg>
+                                    Ambil Foto
+                                </button>
+                            </div>
                             <div id="checkinPreviewContainer" class="hidden mt-3">
                                 <div class="bg-[#eaf4f1] rounded-xl p-3 md:p-4 flex flex-col sm:flex-row items-center gap-3 md:gap-4">
                                     <img id="checkinPreview" src="" class="w-16 h-16 md:w-20 md:h-20 rounded-xl object-cover border-2 border-white shadow" alt="Preview">
@@ -331,7 +418,6 @@
                             <input type="hidden" name="photo" id="photoInput">
                         </div>
 
-                        {{-- Location --}}
                         <div class="mb-5">
                             <label class="block text-sm font-semibold text-gray-700 mb-2">
                                 <span class="flex items-center gap-2">
@@ -354,7 +440,6 @@
                             <input type="hidden" name="checkin_address" id="checkin_address">
                         </div>
 
-                        {{-- Note --}}
                         <div class="mb-6">
                             <label class="block text-sm font-semibold text-gray-700 mb-2">
                                 <span class="flex items-center gap-2">
@@ -377,17 +462,38 @@
 
                     {{-- CHECK OUT FORM --}}
                     @elseif(!$attendanceToday->check_out)
+
+                    {{-- PERINGATAN JIKA BELUM BISA CHECKOUT (UNTUK SEMUA ROLE) --}}
+                    @if(!$canCheckout)
+                    <div class="mb-5 p-4 bg-amber-50 border-l-4 border-amber-500 rounded-xl">
+                        <div class="flex items-start gap-3">
+                            <svg class="w-5 h-5 text-amber-600 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
+                            </svg>
+                            <div class="flex-1">
+                                <p class="font-semibold text-amber-800 text-sm">⚠️ BELUM BISA CHECKOUT!</p>
+                                <p class="text-sm text-amber-700 mt-1">{{ $checkoutWarningMessage }}</p>
+                                <a href="{{ $checkoutRedirectRoute }}" class="inline-flex items-center gap-2 mt-3 text-sm font-semibold text-amber-800 hover:text-amber-900">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+                                    </svg>
+                                    Klik di sini untuk {{ $checkoutRedirectText }} →
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    @endif
+
                     <div class="mb-5 p-3 bg-[#eaf4f1] rounded-xl text-center flex items-center justify-center gap-2">
                         <svg class="w-4 h-4 md:w-5 md:h-5 text-[#2c5e4e]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
                         </svg>
-                        <p class="text-[#2c5e4e] text-sm md:text-base">Anda check in pukul <strong>{{ $attendanceToday->check_in->format('H:i:s') }}</strong></p>
+                        <p class="text-[#2c5e4e] text-sm md:text-base">Anda check in pukul <strong>{{ \Carbon\Carbon::parse($attendanceToday->check_in)->format('H:i:s') }}</strong></p>
                     </div>
 
                     <form action="{{ route('attendance.checkout') }}" method="POST" id="checkoutForm">
                         @csrf
 
-                        {{-- Camera --}}
                         <div class="mb-5">
                             <label class="block text-sm font-semibold text-gray-700 mb-2">
                                 <span class="flex items-center gap-2">
@@ -398,17 +504,17 @@
                                     Foto Check Out
                                 </span>
                             </label>
-                           <div id="cameraContainerCheckout" class="relative rounded-xl overflow-hidden bg-gray-900 w-full md:max-w-2xl mx-auto">
-    <video id="cameraCheckout" autoplay playsinline class="w-full h-auto md:h-[480px] object-cover"></video>
-    <canvas id="canvasCheckout" class="hidden"></canvas>
-    <button type="button" onclick="captureCheckoutPhoto()" class="absolute bottom-4 left-1/2 -translate-x-1/2 bg-white/95 hover:bg-white text-[#2c5e4e] font-semibold px-5 md:px-7 py-2 md:py-2.5 rounded-full shadow-lg transition-all text-sm md:text-base whitespace-nowrap flex items-center gap-2">
-        <svg class="w-5 h-5 md:w-6 md:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"></path>
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"></path>
-        </svg>
-        Ambil Foto
-    </button>
-</div>
+                            <div id="cameraContainerCheckout" class="relative rounded-xl overflow-hidden bg-gray-900 w-full md:max-w-2xl mx-auto">
+                                <video id="cameraCheckout" autoplay playsinline class="w-full h-auto md:h-[400px] object-cover"></video>
+                                <canvas id="canvasCheckout" class="hidden"></canvas>
+                                <button type="button" onclick="captureCheckoutPhoto()" class="absolute bottom-4 left-1/2 -translate-x-1/2 bg-white/95 hover:bg-white text-[#2c5e4e] font-semibold px-5 md:px-7 py-2 md:py-2.5 rounded-full shadow-lg transition-all text-sm md:text-base whitespace-nowrap flex items-center gap-2">
+                                    <svg class="w-5 h-5 md:w-6 md:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"></path>
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                                    </svg>
+                                    Ambil Foto
+                                </button>
+                            </div>
                             <div id="checkoutPreviewContainer" class="hidden mt-3">
                                 <div class="bg-[#eaf4f1] rounded-xl p-3 md:p-4 flex flex-col sm:flex-row items-center gap-3 md:gap-4">
                                     <img id="checkoutPreview" src="" class="w-16 h-16 md:w-20 md:h-20 rounded-xl object-cover border-2 border-white shadow" alt="Preview">
@@ -427,7 +533,6 @@
                             <input type="hidden" name="checkout_photo" id="checkoutPhotoInput">
                         </div>
 
-                        {{-- Location --}}
                         <div class="mb-5">
                             <label class="block text-sm font-semibold text-gray-700 mb-2">
                                 <span class="flex items-center gap-2">
@@ -450,22 +555,6 @@
                             <input type="hidden" name="checkout_address" id="checkout_address">
                         </div>
 
-                        {{-- Palm Weight (khusus user) --}}
-                        @if(Auth::user()->role == 'user')
-                        <div class="mb-5">
-                            <label class="block text-sm font-semibold text-gray-700 mb-2">
-                                <span class="flex items-center gap-2">
-                                    <svg class="w-4 h-4 md:w-5 md:h-5 text-[#2c5e4e]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"></path>
-                                    </svg>
-                                    Berat Sawit (KG)
-                                </span>
-                            </label>
-                            <input type="number" step="0.1" min="0" name="palm_weight" id="palm_weight" required class="w-full px-3 md:px-4 py-2 md:py-3 rounded-xl border border-gray-200 focus:border-[#2c5e4e] focus:ring-2 focus:ring-[#2c5e4e]/20 outline-none transition text-sm md:text-base" placeholder="0.0">
-                        </div>
-                        @endif
-
-                        {{-- Note --}}
                         <div class="mb-6">
                             <label class="block text-sm font-semibold text-gray-700 mb-2">
                                 <span class="flex items-center gap-2">
@@ -478,15 +567,24 @@
                             <textarea name="note" id="checkout_note" class="w-full px-3 md:px-4 py-2 md:py-3 rounded-xl border border-gray-200 focus:border-[#2c5e4e] focus:ring-2 focus:ring-[#2c5e4e]/20 outline-none transition text-sm md:text-base" rows="3" required placeholder="Ringkasan pekerjaan hari ini…"></textarea>
                         </div>
 
-                        <button type="button" onclick="submitCheckout()" id="submitCheckoutBtn" disabled class="w-full bg-[#d4a373] hover:bg-[#b88352] text-white font-semibold py-2.5 md:py-3 rounded-xl transition-all shadow-md disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 text-sm md:text-base">
-                            <svg class="w-4 h-4 md:w-5 md:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path>
-                            </svg>
-                            Simpan & Check Out
-                        </button>
+                        {{-- TOMBOL CHECKOUT (DISABLED JIKA BELUM BISA CHECKOUT) --}}
+                        @if(!$canCheckout)
+                            <button type="button" disabled class="w-full bg-gray-300 cursor-not-allowed text-gray-500 font-semibold py-2.5 md:py-3 rounded-xl shadow-md flex items-center justify-center gap-2 text-sm md:text-base">
+                                <svg class="w-4 h-4 md:w-5 md:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
+                                </svg>
+                                {{ $checkoutRedirectText }} Dulu Sebelum Checkout
+                            </button>
+                        @else
+                            <button type="button" onclick="submitCheckout()" id="submitCheckoutBtn" disabled class="w-full bg-[#d4a373] hover:bg-[#b88352] text-white font-semibold py-2.5 md:py-3 rounded-xl transition-all shadow-md disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 text-sm md:text-base">
+                                <svg class="w-4 h-4 md:w-5 md:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path>
+                                </svg>
+                                Simpan & Check Out
+                            </button>
+                        @endif
                     </form>
 
-                    {{-- DONE STATE --}}
                     @else
                     <div class="text-center py-8 md:py-12">
                         <div class="w-16 h-16 md:w-20 md:h-20 bg-[#e8f5f0] rounded-full flex items-center justify-center mx-auto mb-4">
@@ -508,7 +606,7 @@
 
 <script>
 // ── CLOCK ───────────────────────────────────────────
-let currentTime = new Date("{{ $serverTime ?? now() }}");
+let currentTime = new Date("{{ now('Asia/Jakarta') }}");
 
 function updateClock() {
     currentTime.setSeconds(currentTime.getSeconds() + 1);
@@ -540,57 +638,91 @@ function showTab(tab) {
 }
 
 // ── CAMERA ──────────────────────────────────────────
-async function initCamera(id) {
-    const video = document.getElementById(id);
-    if (!video) return;
+async function initCamera(videoElement) {
+    if (!videoElement) return;
     try {
+        if (videoElement.srcObject) {
+            videoElement.srcObject.getTracks().forEach(track => track.stop());
+        }
         const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'user' }, audio: false });
-        video.srcObject = stream;
-    } catch (e) {
-        alert('Kamera tidak dapat diakses. Periksa izin browser.');
+        videoElement.srcObject = stream;
+    } catch (error) {
+        console.error('Camera error:', error);
+        alert('Kamera tidak dapat diakses. Periksa izin browser Anda.');
     }
 }
 
-function stopCamera(video) {
-    if (video.srcObject) {
-        video.srcObject.getTracks().forEach(t => t.stop());
-        video.srcObject = null;
+function stopCamera(videoElement) {
+    if (videoElement && videoElement.srcObject) {
+        videoElement.srcObject.getTracks().forEach(track => track.stop());
+        videoElement.srcObject = null;
     }
 }
 
-function capture(videoId, canvasId) {
-    const video = document.getElementById(videoId);
-    const canvas = document.getElementById(canvasId);
-    if (video.videoWidth === 0) { alert('Kamera belum siap, tunggu sebentar.'); return null; }
+function capturePhoto(video, canvas, previewImg, previewContainer, cameraContainer, photoInput, submitBtnId) {
+    if (video.videoWidth === 0) {
+        alert('Kamera belum siap, tunggu sebentar.');
+        return false;
+    }
+    
     canvas.width = video.videoWidth;
     canvas.height = video.videoHeight;
     canvas.getContext('2d').drawImage(video, 0, 0);
-    const img = canvas.toDataURL('image/jpeg', 0.85);
+    
+    const photoData = canvas.toDataURL('image/jpeg', 0.85);
+    photoInput.value = photoData;
+    previewImg.src = photoData;
+    previewContainer.classList.remove('hidden');
+    cameraContainer.classList.add('hidden');
+    
     stopCamera(video);
-    return img;
+    
+    const submitBtn = document.getElementById(submitBtnId);
+    if (submitBtn) {
+        submitBtn.disabled = false;
+    }
+    
+    return true;
+}
+
+function retakePhoto(video, cameraContainer, previewContainer, photoInput, submitBtnId) {
+    photoInput.value = '';
+    previewContainer.classList.add('hidden');
+    cameraContainer.classList.remove('hidden');
+    
+    const submitBtn = document.getElementById(submitBtnId);
+    if (submitBtn) {
+        submitBtn.disabled = true;
+    }
+    
+    initCamera(video);
 }
 
 // ── CHECK IN ─────────────────────────────────────────
+let checkinVideo, checkinCanvas, checkinPreviewImg, checkinPreviewContainer, checkinCameraContainer, checkinPhotoInput;
+
 function captureCheckinPhoto() {
-    const img = capture('camera', 'canvas');
-    if (!img) return;
-    document.getElementById('photoInput').value = img;
-    document.getElementById('checkinPreview').src = img;
-    document.getElementById('checkinPreviewContainer').classList.remove('hidden');
-    document.getElementById('cameraContainer').classList.add('hidden');
-    document.getElementById('submitCheckinBtn').disabled = false;
+    if (!checkinVideo) {
+        checkinVideo = document.getElementById('camera');
+        checkinCanvas = document.getElementById('canvas');
+        checkinPreviewImg = document.getElementById('checkinPreview');
+        checkinPreviewContainer = document.getElementById('checkinPreviewContainer');
+        checkinCameraContainer = document.getElementById('cameraContainer');
+        checkinPhotoInput = document.getElementById('photoInput');
+    }
+    
+    capturePhoto(checkinVideo, checkinCanvas, checkinPreviewImg, checkinPreviewContainer, checkinCameraContainer, checkinPhotoInput, 'submitCheckinBtn');
 }
 
 function retakeCheckinPhoto() {
-    document.getElementById('photoInput').value = '';
-    document.getElementById('checkinPreviewContainer').classList.add('hidden');
-    document.getElementById('cameraContainer').classList.remove('hidden');
-    document.getElementById('submitCheckinBtn').disabled = true;
-    initCamera('camera');
+    retakePhoto(checkinVideo, checkinCameraContainer, checkinPreviewContainer, checkinPhotoInput, 'submitCheckinBtn');
 }
 
 function submitCheckin() {
-    if (!document.getElementById('photoInput').value) { alert('Silakan ambil foto terlebih dahulu.'); return; }
+    if (!document.getElementById('photoInput').value) {
+        alert('Silakan ambil foto terlebih dahulu.');
+        return;
+    }
     const btn = document.getElementById('submitCheckinBtn');
     btn.innerHTML = '<svg class="w-4 h-4 md:w-5 md:h-5 animate-spin" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg> Memproses...';
     btn.disabled = true;
@@ -598,26 +730,30 @@ function submitCheckin() {
 }
 
 // ── CHECK OUT ─────────────────────────────────────────
+let checkoutVideo, checkoutCanvas, checkoutPreviewImg, checkoutPreviewContainer, checkoutCameraContainer, checkoutPhotoInput;
+
 function captureCheckoutPhoto() {
-    const img = capture('cameraCheckout', 'canvasCheckout');
-    if (!img) return;
-    document.getElementById('checkoutPhotoInput').value = img;
-    document.getElementById('checkoutPreview').src = img;
-    document.getElementById('checkoutPreviewContainer').classList.remove('hidden');
-    document.getElementById('cameraContainerCheckout').classList.add('hidden');
-    document.getElementById('submitCheckoutBtn').disabled = false;
+    if (!checkoutVideo) {
+        checkoutVideo = document.getElementById('cameraCheckout');
+        checkoutCanvas = document.getElementById('canvasCheckout');
+        checkoutPreviewImg = document.getElementById('checkoutPreview');
+        checkoutPreviewContainer = document.getElementById('checkoutPreviewContainer');
+        checkoutCameraContainer = document.getElementById('cameraContainerCheckout');
+        checkoutPhotoInput = document.getElementById('checkoutPhotoInput');
+    }
+    
+    capturePhoto(checkoutVideo, checkoutCanvas, checkoutPreviewImg, checkoutPreviewContainer, checkoutCameraContainer, checkoutPhotoInput, 'submitCheckoutBtn');
 }
 
 function retakeCheckoutPhoto() {
-    document.getElementById('checkoutPhotoInput').value = '';
-    document.getElementById('checkoutPreviewContainer').classList.add('hidden');
-    document.getElementById('cameraContainerCheckout').classList.remove('hidden');
-    document.getElementById('submitCheckoutBtn').disabled = true;
-    initCamera('cameraCheckout');
+    retakePhoto(checkoutVideo, checkoutCameraContainer, checkoutPreviewContainer, checkoutPhotoInput, 'submitCheckoutBtn');
 }
 
 function submitCheckout() {
-    if (!document.getElementById('checkoutPhotoInput').value) { alert('Silakan ambil foto terlebih dahulu.'); return; }
+    if (!document.getElementById('checkoutPhotoInput').value) {
+        alert('Silakan ambil foto terlebih dahulu.');
+        return;
+    }
     const btn = document.getElementById('submitCheckoutBtn');
     btn.innerHTML = '<svg class="w-4 h-4 md:w-5 md:h-5 animate-spin" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg> Memproses...';
     btn.disabled = true;
@@ -660,10 +796,7 @@ async function getLocation() {
             const locationTexts = ['locationText', 'locationTextCheckout'];
             locationTexts.forEach(id => {
                 const el = document.getElementById(id);
-                if (el) {
-                    el.textContent = address;
-                    el.classList.remove('location-loading');
-                }
+                if (el) el.textContent = address;
             });
         },
         () => {
@@ -682,13 +815,26 @@ document.addEventListener('DOMContentLoaded', () => {
     @if(!$attendanceToday || !$attendanceToday->check_out)
         showTab('absen');
         setTimeout(() => {
-            initCamera('camera');
-            initCamera('cameraCheckout');
-        }, 350);
+            if (document.getElementById('camera')) {
+                initCamera(document.getElementById('camera'));
+            }
+            if (document.getElementById('cameraCheckout')) {
+                initCamera(document.getElementById('cameraCheckout'));
+            }
+        }, 500);
     @else
         showTab('today');
     @endif
     getLocation();
+});
+
+window.addEventListener('beforeunload', () => {
+    if (checkinVideo && checkinVideo.srcObject) {
+        stopCamera(checkinVideo);
+    }
+    if (checkoutVideo && checkoutVideo.srcObject) {
+        stopCamera(checkoutVideo);
+    }
 });
 </script>
 @endsection

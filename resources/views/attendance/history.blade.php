@@ -30,15 +30,14 @@
                             {{ ucfirst(Auth::user()->role) }}
                         </span>
                     </div>
-                    
                 </div>
             </div>
         </div>
 
         {{-- ============================================================ --}}
-        {{-- SUMMARY STATS (tanpa hover border) --}}
+        {{-- SUMMARY STATS --}}
         {{-- ============================================================ --}}
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 mb-8">
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-5 mb-8">
             
             <div class="bg-white rounded-2xl p-5 border border-[#E2E8F0] transition-all hover:shadow-md">
                 <div class="flex items-start justify-between">
@@ -94,6 +93,23 @@
             <div class="bg-white rounded-2xl p-5 border border-[#E2E8F0] transition-all hover:shadow-md">
                 <div class="flex items-start justify-between">
                     <div>
+                        <p class="text-xs font-medium text-gray-500 uppercase tracking-wide">Izin/Sakit</p>
+                        <p class="text-3xl font-bold text-gray-800 mt-1">
+                            {{ $riwayat->whereIn('status', ['izin', 'sakit'])->count() }}
+                            <span class="text-base font-medium text-gray-400">hari</span>
+                        </p>
+                    </div>
+                    <div class="w-12 h-12 rounded-xl bg-[#eaf4f1] flex items-center justify-center">
+                        <svg class="w-6 h-6 text-[#2c5e4e]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/>
+                        </svg>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-2xl p-5 border border-[#E2E8F0] transition-all hover:shadow-md">
+                <div class="flex items-start justify-between">
+                    <div>
                         <p class="text-xs font-medium text-gray-500 uppercase tracking-wide">Selesai</p>
                         <p class="text-3xl font-bold text-gray-800 mt-1">
                             {{ $riwayat->whereNotNull('check_out')->count() }}
@@ -127,6 +143,7 @@
                             <option value="hadir">Hadir</option>
                             <option value="terlambat">Terlambat</option>
                             <option value="izin">Izin</option>
+                            <option value="sakit">Sakit</option>
                         </select>
                         <svg class="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
@@ -185,6 +202,18 @@
         </div>
 
         {{-- ============================================================ --}}
+        {{-- INFO BADGE UNTUK TANGGAL MENDATANG --}}
+        {{-- ============================================================ --}}
+        <div class="mb-4 flex justify-end">
+            <span class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-blue-50 text-blue-600 rounded-lg text-xs">
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                </svg>
+                <span>📅 Izin/Sakit yang sudah disetujui untuk tanggal mendatang akan muncul di sini</span>
+            </span>
+        </div>
+
+        {{-- ============================================================ --}}
         {{-- TABLE CARD --}}
         {{-- ============================================================ --}}
         <div class="bg-white rounded-2xl shadow-sm border border-[#E2E8F0] overflow-hidden">
@@ -211,12 +240,25 @@
                         </thead>
                         <tbody id="tableBody">
                             @forelse($riwayat as $absen)
-                            <tr class="border-b border-gray-100 hover:bg-gray-50 transition" data-status="{{ $absen->status }}" data-date="{{ \Carbon\Carbon::parse($absen->date)->format('Y-m-d') }}" data-month="{{ \Carbon\Carbon::parse($absen->date)->format('Y-m') }}">
+                            @php
+                                $tanggalAbsen = \Carbon\Carbon::parse($absen->date);
+                                $isFutureDate = $tanggalAbsen->isFuture();
+                                $isToday = $tanggalAbsen->isToday();
+                            @endphp
+                            <tr class="border-b border-gray-100 hover:bg-gray-50 transition {{ $isFutureDate ? 'bg-blue-50/30' : '' }}" 
+                                data-status="{{ $absen->status }}" 
+                                data-date="{{ $tanggalAbsen->format('Y-m-d') }}" 
+                                data-month="{{ $tanggalAbsen->format('Y-m') }}">
                                 <td class="px-5 py-4 font-semibold text-gray-900" data-label="Tanggal">
-                                    {{ \Carbon\Carbon::parse($absen->date)->format('d/m/Y') }}
+                                    {{ $tanggalAbsen->format('d/m/Y') }}
+                                    @if($isFutureDate)
+                                        <span class="ml-2 inline-flex items-center px-2 py-0.5 rounded text-[10px] font-medium bg-blue-100 text-blue-600">
+                                            Akan Datang
+                                        </span>
+                                    @endif
                                 </td>
                                 <td class="px-5 py-4 text-gray-700" data-label="Hari">
-                                    {{ \Carbon\Carbon::parse($absen->date)->translatedFormat('l') }}
+                                    {{ $tanggalAbsen->translatedFormat('l') }}
                                 </td>
                                 <td class="px-5 py-4 font-semibold" data-label="Masuk">
                                     @if($absen->check_in)
@@ -260,18 +302,35 @@
                                             Terlambat
                                         </span>
                                     @elseif($absen->status == 'izin')
-                                        <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-[#eaf4f1] text-blue-600">
+                                        <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-blue-50 text-blue-600">
                                             <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/>
                                             </svg>
                                             Izin
+                                            @if($isFutureDate)
+                                                <span class="ml-1 text-[10px] bg-blue-200 px-1 rounded">disetujui</span>
+                                            @endif
+                                        </span>
+                                    @elseif($absen->status == 'sakit')
+                                        <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-purple-50 text-purple-600">
+                                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/>
+                                            </svg>
+                                            Sakit
+                                            @if($isFutureDate)
+                                                <span class="ml-1 text-[10px] bg-purple-200 px-1 rounded">disetujui</span>
+                                            @endif
                                         </span>
                                     @else
                                         <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-gray-100 text-gray-600">{{ $absen->status }}</span>
                                     @endif
                                 </td>
                                 <td class="px-5 py-4 text-gray-500" data-label="Keterangan">
-                                    {{ $absen->note ?? '-' }}
+                                    @if($isFutureDate && in_array($absen->status, ['izin', 'sakit']))
+                                        <span class="text-blue-600 text-xs">✓ Sudah disetujui untuk tanggal ini</span>
+                                    @else
+                                        {{ $absen->note ?? '-' }}
+                                    @endif
                                 </td>
                             </tr>
                             @empty
@@ -329,15 +388,7 @@
             </div>
         </div>
 
-        {{-- QUICK ACTION --}}
-        <div class="mt-10 text-center">
-            <a href="{{ route('attendance.index') }}" class="inline-flex items-center gap-2 bg-[#2c5e4e] hover:bg-[#1f4a3d] text-white px-6 py-3 rounded-xl font-semibold transition-all shadow-md">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1"/>
-                </svg>
-                Absensi Sekarang
-            </a>
-        </div>
+    
 
     </div>
 </div>

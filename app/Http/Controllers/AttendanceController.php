@@ -4,9 +4,13 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Attendance;
-use App\Models\CatatanPanen;
+use App\Models\LaporanPanen;
+use App\Models\KinerjaCleaning;
+use App\Models\PatroliSecurity;
+use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
+use Carbon\Carbon;
 
 class AttendanceController extends Controller
 {
@@ -20,7 +24,7 @@ class AttendanceController extends Controller
     {
         $user = Auth::user();
 
-        $today = today();
+        $today = Carbon::today('Asia/Jakarta');
 
         $attendanceToday = Attendance::where('user_id', $user->id)
             ->whereDate('date', $today)
@@ -31,169 +35,119 @@ class AttendanceController extends Controller
             ->whereYear('date', now()->year)
             ->count();
 
+        // Data untuk user (pekerja sawit)
         $monthlyPalmWeight = 0;
-
+        $todayPalmWeight = 0;
+        
         if ($user->role == 'user') {
-
-            $monthlyPalmWeight = CatatanPanen::where('id_pegawai', $user->id)
+            $monthlyPalmWeight = LaporanPanen::where('pekerja_id', $user->id)
                 ->whereMonth('tanggal', now()->month)
                 ->whereYear('tanggal', now()->year)
-                ->sum('berat_kg');
+                ->sum('brondolan_kg') ?? 0;
+                
+            $panenHariIni = LaporanPanen::where('pekerja_id', $user->id)
+                ->whereDate('tanggal', $today)
+                ->first();
+                
+            if ($panenHariIni) {
+                $todayPalmWeight = $panenHariIni->brondolan_kg;
+            }
         }
 
-        $serverTime = now();
+        $serverTime = now('Asia/Jakarta');
 
         return view('attendance.index', compact(
             'attendanceToday',
             'monthlyCount',
             'monthlyPalmWeight',
+            'todayPalmWeight',
             'serverTime'
         ));
     }
 
     /*
     |--------------------------------------------------------------------------
-    | CHECK IN
+    | CHECK IN (STORE)
     |--------------------------------------------------------------------------
     */
 
     public function store(Request $request)
     {
         $user = Auth::user();
+        $today = Carbon::today('Asia/Jakarta');
 
-        $today = today();
-
-        /*
-        |--------------------------------------------------------------------------
-        | VALIDASI
-        |--------------------------------------------------------------------------
-        */
-
+        // Validasi form
         $request->validate([
-
             'photo' => 'required|string',
-
             'checkin_latitude' => 'required|numeric',
-
             'checkin_longitude' => 'required|numeric',
-
             'checkin_address' => 'nullable|string',
-
             'note' => 'nullable|string|max:500',
         ]);
 
-        /*
-        |--------------------------------------------------------------------------
-        | SUDAH ABSEN?
-        |--------------------------------------------------------------------------
-        */
-
+        // Cek sudah absen?
         $existing = Attendance::where('user_id', $user->id)
             ->whereDate('date', $today)
             ->first();
 
         if ($existing) {
-
-            return back()->with(
-                'error',
-                'Anda sudah check in hari ini'
-            );
+            return back()->with('error', 'Anda sudah check in hari ini');
         }
 
-        /*
-        |--------------------------------------------------------------------------
-        | VALIDASI FOTO
-        |--------------------------------------------------------------------------
-        */
-
+        // Validasi foto
         if (!str_contains($request->photo, 'base64')) {
-
-            return back()->with(
-                'error',
-                'Foto check in tidak valid'
-            );
+            return back()->with('error', 'Foto check in tidak valid');
         }
 
-        /*
-        |--------------------------------------------------------------------------
-        | STATUS
-        |--------------------------------------------------------------------------
-        */
-
-        $checkInTime = now();
-
-      if (in_array($user->role, ['security', 'cleaning'])) {
-    $status = 'tepat waktu'; // Shift fleksibel, tidak ada terlambat
+        // ============================================================
+        // VALIDASI KETERLAMBATAN - JAM 07:30
+        // ============================================================
+        $checkInTime = now('Asia/Jakarta');
+        
+        // Batas waktu check in (07:30)
+        $batasWaktu = Carbon::createFromTime(7, 30, 0, 'Asia/Jakarta');
+        
+        // Cek keterlambatan
+       // Cek keterlambatan
+if ($checkInTime->gt($batasWaktu)) {
+    $status = 'terlambat';
 } else {
-    $status = $checkInTime->format('H:i') <= '08:00'
-        ? 'tepat waktu'
-        : 'terlambat';
+    $status = 'hadir';  // <-- GANTI 'tepat waktu' menjadi 'hadir'
 }
 
-        /*
-        |--------------------------------------------------------------------------
-        | SIMPAN FOTO
-        |--------------------------------------------------------------------------
-        */
-
+        // Simpan foto
         $image = $request->photo;
-
-        $image = str_replace(
-            'data:image/jpeg;base64,',
-            '',
-            $image
-        );
-
+        $image = str_replace('data:image/jpeg;base64,', '', $image);
         $image = str_replace(' ', '+', $image);
-
-        $imageName = 'checkin_' . time() . '.jpg';
-
+        $imageName = 'checkin_' . time() . '_' . rand(100, 999) . '.jpg';
+        
         Storage::disk('public')->put(
             'attendance_photos/' . $imageName,
             base64_decode($image)
         );
-
         $photoPath = 'attendance_photos/' . $imageName;
 
-        /*
-        |--------------------------------------------------------------------------
-        | ADDRESS DARI JAVASCRIPT
-        |--------------------------------------------------------------------------
-        */
-
-        $checkinAddress = $request->checkin_address;
-
-        /*
-        |--------------------------------------------------------------------------
-        | SIMPAN DATABASE
-        |--------------------------------------------------------------------------
-        */
-
+        // Simpan database
         Attendance::create([
-
             'user_id' => $user->id,
-
             'date' => $today,
-
             'check_in' => $checkInTime,
-
             'status' => $status,
-
             'photo_path' => $photoPath,
-
             'checkin_latitude' => $request->checkin_latitude,
-
             'checkin_longitude' => $request->checkin_longitude,
-
-            'checkin_address' => $checkinAddress,
-
+            'checkin_address' => $request->checkin_address,
             'note' => $request->note,
         ]);
 
-        return back()->with(
-            'success',
-            'Check In berhasil'
-        );
+        // Pesan berdasarkan status
+        if ($status == 'terlambat') {
+            $message = '⚠️ Check In berhasil, tapi Anda TERLAMBAT! Batas check in adalah pukul 07:30.';
+        } else {
+            $message = '✅ Check In berhasil! Selamat bekerja.';
+        }
+
+        return back()->with('success', $message);
     }
 
     /*
@@ -205,188 +159,194 @@ class AttendanceController extends Controller
     public function checkout(Request $request)
     {
         $user = Auth::user();
+        $today = Carbon::today('Asia/Jakarta');
 
-        $today = today();
-
-        /*
-        |--------------------------------------------------------------------------
-        | CARI ABSENSI
-        |--------------------------------------------------------------------------
-        */
-
+        // Cari absensi
         $attendance = Attendance::where('user_id', $user->id)
             ->whereDate('date', $today)
             ->first();
 
         if (!$attendance) {
-
-            return back()->with(
-                'error',
-                'Anda belum check in'
-            );
+            return back()->with('error', 'Anda belum check in hari ini!');
         }
 
         if ($attendance->check_out) {
-
-            return back()->with(
-                'error',
-                'Anda sudah check out'
-            );
+            return back()->with('error', 'Anda sudah check out hari ini!');
         }
 
-        /*
-        |--------------------------------------------------------------------------
-        | VALIDASI
-        |--------------------------------------------------------------------------
-        */
+        // ============================================================
+        // VALIDASI KHUSUS BERDASARKAN ROLE
+        // ============================================================
 
+        // VALIDASI UNTUK PEKERJA SAWIT (USER)
         if ($user->role == 'user') {
-
-            $request->validate([
-
-                'checkout_photo' => 'required|string',
-
-                'checkout_latitude' => 'required|numeric',
-
-                'checkout_longitude' => 'required|numeric',
-
-                'checkout_address' => 'nullable|string',
-
-                'palm_weight' => 'required|numeric|min:0',
-
-                'note' => 'nullable|string|max:500',
-            ]);
-
-        } else {
-
-            $request->validate([
-
-                'checkout_photo' => 'required|string',
-
-                'checkout_latitude' => 'required|numeric',
-
-                'checkout_longitude' => 'required|numeric',
-
-                'checkout_address' => 'nullable|string',
-
-                'note' => 'required|string|max:500',
-            ]);
+            $hasPanen = LaporanPanen::where('pekerja_id', $user->id)
+                ->whereDate('tanggal', $today)
+                ->exists();
+                
+            if (!$hasPanen) {
+                return back()->with('error', 
+                    '⚠️ ANDA BELUM BISA CHECKOUT! ⚠️<br><br>' .
+                    'Anda harus menginput panen terlebih dahulu sebelum checkout.<br><br>' .
+                    'Silakan klik menu <strong>"Input Panen Sawit"</strong> untuk input panen hari ini.'
+                );
+            }
         }
 
-        /*
-        |--------------------------------------------------------------------------
-        | VALIDASI FOTO
-        |--------------------------------------------------------------------------
-        */
+        // VALIDASI UNTUK CLEANING SERVICE
+        if ($user->role == 'cleaning') {
+            $hasKinerja = KinerjaCleaning::where('user_id', $user->id)
+                ->whereDate('tanggal', $today)
+                ->exists();
+                
+            if (!$hasKinerja) {
+                return back()->with('error', 
+                    '⚠️ ANDA BELUM BISA CHECKOUT! ⚠️<br><br>' .
+                    'Anda harus menginput kinerja cleaning terlebih dahulu sebelum checkout.<br><br>' .
+                    'Silakan klik menu <strong>"Input Kinerja Cleaning"</strong> untuk input kinerja hari ini.'
+                );
+            }
+        }
 
-        if (!str_contains($request->checkout_photo, 'base64')) {
+        // VALIDASI UNTUK SECURITY
+        if ($user->role == 'security') {
+            $hasPatroli = PatroliSecurity::where('user_id', $user->id)
+                ->whereDate('created_at', $today)
+                ->exists();
+                
+            if (!$hasPatroli) {
+                return back()->with('error', 
+                    '⚠️ ANDA BELUM BISA CHECKOUT! ⚠️<br><br>' .
+                    'Anda harus menginput laporan patroli terlebih dahulu sebelum checkout.<br><br>' .
+                    'Silakan klik menu <strong>"Input Patroli"</strong> untuk input patroli hari ini.'
+                );
+            }
+        }
 
-            return back()->with(
-                'error',
-                'Foto checkout tidak valid'
+        // ============================================================
+        // VALIDASI UNTUK MANDOR
+        // ============================================================
+// VALIDASI UNTUK MANDOR
+if ($user->role == 'mandor') {
+    $pekerjaList = User::where('mandor_id', $user->id)
+        ->where('role', 'user')
+        ->get();
+    
+    if ($pekerjaList->count() > 0) {
+        // CEK APAKAH MANDOR SUDAH VERIFIKASI LAPORAN PANEN
+        $sudahVerifikasi = LaporanPanen::where('mandor_id', $user->id)
+            ->whereDate('tanggal', $today)
+            ->where('status', 'diverifikasi_mandor')
+            ->exists();
+        
+        if (!$sudahVerifikasi) {
+            return back()->with('error', 
+                '⚠️ ANDA BELUM BISA CHECKOUT! ⚠️<br><br>' .
+                'Anda harus memverifikasi laporan panen terlebih dahulu sebelum checkout.<br><br>' .
+                'Silakan klik menu <strong>"Laporan Panen"</strong> untuk verifikasi laporan panen.'
             );
         }
+    }
+}
 
-        /*
-        |--------------------------------------------------------------------------
-        | SIMPAN FOTO CHECKOUT
-        |--------------------------------------------------------------------------
-        */
+        // ============================================================
+        // VALIDASI FORM
+        // ============================================================
+
+        $request->validate([
+            'checkout_photo' => 'required|string',
+            'checkout_latitude' => 'required|numeric',
+            'checkout_longitude' => 'required|numeric',
+            'checkout_address' => 'nullable|string',
+            'note' => 'nullable|string|max:500',
+        ]);
+
+        // Validasi foto
+        if (!str_contains($request->checkout_photo, 'base64')) {
+            return back()->with('error', 'Foto checkout tidak valid');
+        }
+
+        // ============================================================
+        // SIMPAN FOTO CHECKOUT
+        // ============================================================
 
         $checkoutPhoto = $request->checkout_photo;
-
-        $checkoutPhoto = str_replace(
-            'data:image/jpeg;base64,',
-            '',
-            $checkoutPhoto
-        );
-
+        $checkoutPhoto = str_replace('data:image/jpeg;base64,', '', $checkoutPhoto);
         $checkoutPhoto = str_replace(' ', '+', $checkoutPhoto);
-
-        $imageName = 'checkout_' . time() . '.jpg';
-
+        $imageName = 'checkout_' . time() . '_' . rand(100, 999) . '.jpg';
+        
         Storage::disk('public')->put(
             'checkout_photos/' . $imageName,
             base64_decode($checkoutPhoto)
         );
+        $checkoutPhotoPath = 'checkout_photos/' . $imageName;
 
-        $checkoutPhotoPath =
-            'checkout_photos/' . $imageName;
+        // ============================================================
+        // HITUNG TOTAL JAM KERJA & VALIDASI WAKTU CHECKOUT
+        // ============================================================
 
-        /*
-        |--------------------------------------------------------------------------
-        | ADDRESS DARI JAVASCRIPT
-        |--------------------------------------------------------------------------
-        */
-
-        $checkoutAddress = $request->checkout_address;
-
-        /*
-        |--------------------------------------------------------------------------
-        | UPDATE DATA
-        |--------------------------------------------------------------------------
-        */
-
-        $updateData = [
-
-            'check_out' => now(),
-
-            'checkout_photo_path' => $checkoutPhotoPath,
-
-            'checkout_latitude' => $request->checkout_latitude,
-
-            'checkout_longitude' => $request->checkout_longitude,
-
-            'checkout_address' => $checkoutAddress,
-
-            'note' => $request->note,
-        ];
-
-        /*
-        |--------------------------------------------------------------------------
-        | PEKERJA SAWIT
-        |--------------------------------------------------------------------------
-        */
-
-        if ($user->role == 'user') {
-
-            $updateData['palm_weight']
-                = $request->palm_weight;
-
-            CatatanPanen::create([
-
-                'id_pegawai' => $user->id,
-
-                'tanggal' => $today,
-
-                'id_area_kerja' =>
-                    $user->id_area_kerja ?? null,
-
-                'jumlah_tandan' => 0,
-
-                'berat_kg' =>
-                    $request->palm_weight,
-
-                'catatan' =>
-                    $request->note,
-
-                'foto_panen' =>
-                    $checkoutPhotoPath,
-            ]);
+        $checkInTime = Carbon::parse($attendance->check_in);
+        $checkOutTime = now('Asia/Jakarta');
+        $batasPulangNormal = Carbon::createFromTime(17, 0, 0, 'Asia/Jakarta');
+        
+        $diffInMinutes = $checkOutTime->diffInMinutes($checkInTime);
+        $hours = floor($diffInMinutes / 60);
+        $minutes = $diffInMinutes % 60;
+        $totalHours = sprintf('%d jam %d menit', $hours, $minutes);
+        
+        // Cek apakah checkout terlalu cepat (sebelum jam 17:00)
+        $isTooEarly = $checkOutTime->lt($batasPulangNormal);
+        $warningMessage = null;
+        
+        if ($isTooEarly) {
+            $diffToNormal = $batasPulangNormal->diffInMinutes($checkOutTime);
+            $earlyHours = floor($diffToNormal / 60);
+            $earlyMinutes = $diffToNormal % 60;
+            
+            if ($earlyHours > 0) {
+                $terlaluCepat = $earlyHours . ' jam ' . $earlyMinutes . ' menit';
+            } else {
+                $terlaluCepat = $earlyMinutes . ' menit';
+            }
+            
+            $warningMessage = "⚠️ PERINGATAN: Anda checkout pada pukul " . $checkOutTime->format('H:i:s') . 
+                             ", lebih cepat " . $terlaluCepat . " dari waktu normal (17:00 WIB).";
         }
 
-        /*
-        |--------------------------------------------------------------------------
-        | UPDATE ABSENSI
-        |--------------------------------------------------------------------------
-        */
+        // ============================================================
+        // UPDATE DATA
+        // ============================================================
+
+        $updateData = [
+            'check_out' => $checkOutTime,
+            'checkout_photo_path' => $checkoutPhotoPath,
+            'checkout_latitude' => $request->checkout_latitude,
+            'checkout_longitude' => $request->checkout_longitude,
+            'checkout_address' => $request->checkout_address,
+            'checkout_note' => $request->note,
+            'total_hours' => $totalHours,
+        ];
 
         $attendance->update($updateData);
 
-        return back()->with(
-            'success',
-            'Check Out berhasil'
-        );
+        // ============================================================
+        // PESAN SUKSES
+        // ============================================================
+        
+        $successMessage = '✅ Check Out berhasil! ';
+        
+        if ($checkOutTime->gte($batasPulangNormal)) {
+            $successMessage .= 'Terima kasih telah bekerja penuh hari ini. Selamat istirahat.';
+        } else {
+            $successMessage .= 'Lain kali harap selesaikan pekerjaan hingga pukul 17:00 WIB.';
+        }
+        
+        // Jika ada peringatan, kirim bersama success
+        if ($warningMessage) {
+            return back()->with('success', $successMessage)->with('warning', $warningMessage);
+        }
+        
+        return back()->with('success', $successMessage);
     }
 
     /*
@@ -399,16 +359,107 @@ class AttendanceController extends Controller
     {
         $user = Auth::user();
 
-        $riwayat = Attendance::where(
-                'user_id',
-                $user->id
-            )
+        $riwayat = Attendance::where('user_id', $user->id)
             ->latest('date')
             ->paginate(10);
 
-        return view(
-            'attendance.history',
-            compact('riwayat')
-        );
+        return view('attendance.history', compact('riwayat'));
+    }
+    
+    /*
+    |--------------------------------------------------------------------------
+    | CEK STATUS CHECKOUT (API)
+    |--------------------------------------------------------------------------
+    */
+    
+    public function cekStatusCheckout()
+    {
+        $user = Auth::user();
+        $today = Carbon::today('Asia/Jakarta');
+        
+        $attendance = Attendance::where('user_id', $user->id)
+            ->whereDate('date', $today)
+            ->first();
+        
+        if (!$attendance || !$attendance->check_in) {
+            return response()->json([
+                'can_checkout' => false,
+                'reason' => 'Belum check in',
+                'redirect' => null
+            ]);
+        }
+        
+        if ($attendance->check_out) {
+            return response()->json([
+                'can_checkout' => false,
+                'reason' => 'Sudah checkout',
+                'redirect' => null
+            ]);
+        }
+        
+        $canCheckout = true;
+        $reason = null;
+        $redirectRoute = null;
+        
+        switch ($user->role) {
+            case 'user':
+                $hasPanen = LaporanPanen::where('pekerja_id', $user->id)
+                    ->whereDate('tanggal', $today)
+                    ->exists();
+                if (!$hasPanen) {
+                    $canCheckout = false;
+                    $reason = 'Belum input panen';
+                    $redirectRoute = route('user.panen');
+                }
+                break;
+                
+            case 'cleaning':
+                $hasKinerja = KinerjaCleaning::where('user_id', $user->id)
+                    ->whereDate('tanggal', $today)
+                    ->exists();
+                if (!$hasKinerja) {
+                    $canCheckout = false;
+                    $reason = 'Belum input kinerja cleaning';
+                    $redirectRoute = route('cleaning.kinerja');
+                }
+                break;
+                
+            case 'security':
+                $hasPatroli = PatroliSecurity::where('user_id', $user->id)
+                    ->whereDate('created_at', $today)
+                    ->exists();
+                if (!$hasPatroli) {
+                    $canCheckout = false;
+                    $reason = 'Belum input patroli';
+                    $redirectRoute = route('security.patroli');
+                }
+                break;
+                
+           case 'mandor':
+    $pekerjaList = User::where('mandor_id', $user->id)
+        ->where('role', 'user')
+        ->get();
+    
+    if ($pekerjaList->count() > 0) {
+        // CEK APAKAH MANDOR SUDAH VERIFIKASI LAPORAN PANEN
+        $sudahVerifikasi = LaporanPanen::where('mandor_id', $user->id)
+            ->whereDate('tanggal', $today)
+            ->where('status', 'diverifikasi_mandor')
+            ->exists();
+        
+        if (!$sudahVerifikasi) {
+            $canCheckout = false;
+            $reason = 'Belum verifikasi laporan panen';
+            $redirectRoute = route('mandor.panen');
+        }
+    }
+    break;
+        }
+        
+        return response()->json([
+            'can_checkout' => $canCheckout,
+            'reason' => $reason,
+            'redirect' => $redirectRoute
+        ]);
     }
 }
