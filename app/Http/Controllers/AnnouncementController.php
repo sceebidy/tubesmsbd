@@ -32,15 +32,17 @@ class AnnouncementController extends Controller
             'target_users.required_if' => 'Pilih minimal satu pegawai yang dituju.',
         ]);
 
+        // $casts = 'array' pada model otomatis encode saat simpan,
+        // jadi tidak perlu json_encode manual di sini.
         $targetUsers = $request->target_type === 'specific'
-            ? $request->target_users
+            ? $request->target_users   // array dari form
             : null;
 
         $announcement = Announcement::create([
             'judul'        => $request->judul,
             'isi'          => $request->isi,
             'created_by'   => auth()->id(),
-            'target_users' => $targetUsers ? json_encode($targetUsers) : null,
+            'target_users' => $targetUsers,
         ]);
 
         broadcast(new NewAnnouncementEvent($announcement))->toOthers();
@@ -61,19 +63,17 @@ class AnnouncementController extends Controller
     {
         $userId = auth()->id();
 
-        // Tampilkan pengumuman yang ditujukan ke semua (target_users null)
-        // ATAU yang target_users-nya mengandung ID user ini
+        // target_users sudah di-cast ke array oleh model ($casts = ['target_users' => 'array']).
+        // null  = siaran umum (tampilkan ke semua)
+        // array = hanya tampilkan ke user yang ID-nya ada di array
         $announcements = Announcement::latest()
             ->get()
             ->filter(function ($a) use ($userId) {
                 if (is_null($a->target_users)) {
                     return true; // siaran umum
                 }
-                $targets = is_array($a->target_users)
-                    ? $a->target_users
-                    : json_decode($a->target_users, true);
 
-                return in_array($userId, (array) $targets);
+                return in_array($userId, $a->target_users);
             })
             ->values();
 
@@ -104,14 +104,14 @@ class AnnouncementController extends Controller
         ]);
 
         $targetUsers = $request->target_type === 'specific'
-            ? $request->target_users
+            ? $request->target_users   // array dari form
             : null;
 
         $announcement = Announcement::create([
             'judul'        => $request->judul,
             'isi'          => $request->isi,
             'created_by'   => auth()->id(),
-            'target_users' => $targetUsers ? json_encode($targetUsers) : null,
+            'target_users' => $targetUsers,
         ]);
 
         broadcast(new NewAnnouncementEvent($announcement))->toOthers();

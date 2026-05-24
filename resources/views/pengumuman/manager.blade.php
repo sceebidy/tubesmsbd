@@ -156,7 +156,7 @@
         {{-- List Pengumuman --}}
         <div class="space-y-4">
             @forelse($announcements as $a)
-            @php $targets = $a->target_users ? json_decode($a->target_users, true) : null; @endphp
+            @php $targets = $a->target_users; @endphp
             <div class="bg-white rounded-2xl p-5 md:p-6 border shadow-sm transition-all duration-200 hover:shadow-md
                 {{ $targets ? 'border-amber-200 hover:border-amber-300' : 'border-gray-200 hover:border-[#d0e9e3]' }}">
 
