@@ -97,7 +97,7 @@
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
             </svg>
             <div class="flex-1">
-                <p class="font-semibold text-[#C0392B] text-sm md:text-base">⚠️ PERHATIAN!</p>
+                <p class="font-semibold text-[#C0392B] text-sm md:text-base"> PERHATIAN!</p>
                 <p class="text-sm text-[#7B1C14]">Anda check in pada pukul <strong>{{ \Carbon\Carbon::parse($absenHariIni->check_in)->format('H:i:s') }}</strong>, melebihi batas waktu pukul <strong>07:30 WIB</strong>. Anda dinyatakan <strong>TERLAMBAT</strong>.</p>
             </div>
         </div>

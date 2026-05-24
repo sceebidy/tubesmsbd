@@ -85,7 +85,7 @@ class SecurityPatroliController extends Controller
             if (!$sudahCheckIn) {
                 \Log::warning('User belum check-in, ID: ' . $userId);
                 return redirect()->route('security.patroli')
-                    ->with('error', '❌ Anda harus CHECK-IN terlebih dahulu sebelum dapat menginput laporan patroli!');
+                    ->with('error', ' Anda harus CHECK-IN terlebih dahulu sebelum dapat menginput laporan patroli!');
             }
             
             // ============================================================

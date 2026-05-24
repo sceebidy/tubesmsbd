@@ -142,7 +142,7 @@ if ($checkInTime->gt($batasWaktu)) {
 
         // Pesan berdasarkan status
         if ($status == 'terlambat') {
-            $message = '⚠️ Check In berhasil, tapi Anda TERLAMBAT! Batas check in adalah pukul 07:30.';
+            $message = ' Check In berhasil, tapi Anda TERLAMBAT! Batas check in adalah pukul 07:30.';
         } else {
             $message = '✅ Check In berhasil! Selamat bekerja.';
         }
@@ -186,8 +186,8 @@ if ($checkInTime->gt($batasWaktu)) {
                 
             if (!$hasPanen) {
                 return back()->with('error', 
-                    '⚠️ ANDA BELUM BISA CHECKOUT! ⚠️<br><br>' .
-                    'Anda harus menginput panen terlebih dahulu sebelum checkout.<br><br>' .
+                    ' ANDA BELUM BISA CHECKOUT!' .
+                    'Anda harus menginput panen terlebih dahulu sebelum checkout.' .
                     'Silakan klik menu <strong>"Input Panen Sawit"</strong> untuk input panen hari ini.'
                 );
             }
@@ -201,8 +201,8 @@ if ($checkInTime->gt($batasWaktu)) {
                 
             if (!$hasKinerja) {
                 return back()->with('error', 
-                    '⚠️ ANDA BELUM BISA CHECKOUT! ⚠️<br><br>' .
-                    'Anda harus menginput kinerja cleaning terlebih dahulu sebelum checkout.<br><br>' .
+                    ' ANDA BELUM BISA CHECKOUT! <br><br>' .
+                    'Anda harus menginput kinerja cleaning terlebih dahulu sebelum checkout.' .
                     'Silakan klik menu <strong>"Input Kinerja Cleaning"</strong> untuk input kinerja hari ini.'
                 );
             }
@@ -216,7 +216,7 @@ if ($checkInTime->gt($batasWaktu)) {
                 
             if (!$hasPatroli) {
                 return back()->with('error', 
-                    '⚠️ ANDA BELUM BISA CHECKOUT! ⚠️<br><br>' .
+                    ' ANDA BELUM BISA CHECKOUT! ' .
                     'Anda harus menginput laporan patroli terlebih dahulu sebelum checkout.<br><br>' .
                     'Silakan klik menu <strong>"Input Patroli"</strong> untuk input patroli hari ini.'
                 );
@@ -241,9 +241,9 @@ if ($user->role == 'mandor') {
         
         if (!$sudahVerifikasi) {
             return back()->with('error', 
-                '⚠️ ANDA BELUM BISA CHECKOUT! ⚠️<br><br>' .
-                'Anda harus memverifikasi laporan panen terlebih dahulu sebelum checkout.<br><br>' .
-                'Silakan klik menu <strong>"Laporan Panen"</strong> untuk verifikasi laporan panen.'
+                ' ANDA BELUM BISA CHECKOUT!' .
+                'Anda harus memverifikasi laporan panen terlebih dahulu sebelum checkout.' .
+                'Silakan klik menu Laporan Panen" untuk verifikasi laporan panen.'
             );
         }
     }
@@ -309,8 +309,8 @@ if ($user->role == 'mandor') {
                 $terlaluCepat = $earlyMinutes . ' menit';
             }
             
-            $warningMessage = "⚠️ PERINGATAN: Anda checkout pada pukul " . $checkOutTime->format('H:i:s') . 
-                             ", lebih cepat " . $terlaluCepat . " dari waktu normal (17:00 WIB).";
+            $warningMessage = "PERINGATAN: Terlalu cepat checkout " . $checkOutTime->format('H:i:s') . 
+                              " dari waktu normal (17:00 WIB).";
         }
 
         // ============================================================
@@ -333,7 +333,7 @@ if ($user->role == 'mandor') {
         // PESAN SUKSES
         // ============================================================
         
-        $successMessage = '✅ Check Out berhasil! ';
+        $successMessage = 'Check Out berhasil! ';
         
         if ($checkOutTime->gte($batasPulangNormal)) {
             $successMessage .= 'Terima kasih telah bekerja penuh hari ini. Selamat istirahat.';

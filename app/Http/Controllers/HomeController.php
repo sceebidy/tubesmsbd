@@ -37,76 +37,342 @@ class HomeController extends Controller
         };
     }
 
-    public function adminDashboard()
-    {
-        $today = now('Asia/Jakarta')->startOfDay();
+public function adminDashboard()
+{
+    $today = now('Asia/Jakarta')->startOfDay();
+    $startOfWeek = now('Asia/Jakarta')->startOfWeek();
+    $startOfMonth = now('Asia/Jakarta')->startOfMonth();
+    
+    // ============================================================
+    // 1. DATA STATISTIK UTAMA (KONSISTEN dengan Line Chart)
+    // ============================================================
+    
+    $totalPegawai = User::whereNotIn('role', ['admin', 'manager'])->count();
+    
+    // Dapatkan user yang hadir (check_in tidak null)
+    $hadirIds = Attendance::whereDate('date', $today->toDateString())
+        ->whereNotNull('check_in')
+        ->pluck('user_id')
+        ->toArray();
+    
+    // Dapatkan user yang izin/sakit (disetujui dan mencakup tanggal hari ini)
+    $izinSakitIds = Pengajuan::where('status', 'disetujui')
+        ->where(function($q) use ($today) {
+            $q->whereDate('tanggal_mulai', '<=', $today)
+              ->whereDate('tanggal_selesai', '>=', $today);
+        })
+        ->pluck('user_id')
+        ->toArray();
+    
+    // Hitung statistik
+    $hadirHariIni = count($hadirIds);
+    $totalTerlambat = Attendance::whereDate('date', $today->toDateString())
+        ->where('status', 'terlambat')
+        ->count();
+    
+    // Alpha = Total Pegawai - (Hadir + Izin + Sakit)
+    $totalHadirIzinSakit = count(array_unique(array_merge($hadirIds, $izinSakitIds)));
+    $totalAlpha = $totalPegawai - $totalHadirIzinSakit;
+    
+    // Izin & Sakit Hari Ini (untuk display di donut chart)
+    $izinHariIni = Pengajuan::where('status', 'disetujui')
+        ->where('jenis', 'izin')
+        ->whereDate('tanggal_mulai', '<=', $today)
+        ->whereDate('tanggal_selesai', '>=', $today)
+        ->count();
+    
+    $sakitHariIni = Pengajuan::where('status', 'disetujui')
+        ->where('jenis', 'sakit')
+        ->whereDate('tanggal_mulai', '<=', $today)
+        ->whereDate('tanggal_selesai', '>=', $today)
+        ->count();
+    
+    // Produksi Hari Ini
+    $produksiHariIni = LaporanPanen::whereDate('tanggal', $today->toDateString())
+        ->sum('total_berat_kg') ?? 0;
+    
+    $totalTandanHariIni = LaporanPanen::whereDate('tanggal', $today->toDateString())
+        ->sum('total_tandan') ?? 0;
+    
+    // Rate Kehadiran
+    $totalHadirDanTerlambat = $hadirHariIni + $totalTerlambat;
+    $rateKehadiran = $totalPegawai > 0 ? round(($totalHadirDanTerlambat / $totalPegawai) * 100) : 0;
+    
+    // Aktivitas Terbaru
+    $recentActivities = Attendance::with('user')
+        ->whereDate('date', $today->toDateString())
+        ->whereNotNull('check_in')
+        ->orderBy('check_in', 'desc')
+        ->limit(5)
+        ->get();
+    
+    // ============================================================
+    // 2. DATA DEPARTEMEN
+    // ============================================================
+    
+    $roles = [
+        'user' => 'Pengangkut Sawit',
+        'security' => 'Security',
+        'cleaning' => 'Cleaning',
+        'kantoran' => 'Administrasi',
+        'mandor' => 'Mandor',
+    ];
+    $departments = [];
 
-        $totalPegawai = User::whereNotIn('role', ['admin', 'manager'])->count();
-        
-        $hadirHariIni = Attendance::whereDate('date', $today->toDateString())
+    foreach ($roles as $role => $name) {
+        $total = User::where('role', $role)->count();
+        $hadir = Attendance::whereDate('date', $today->toDateString())
             ->whereNotNull('check_in')
+            ->whereHas('user', fn($q) => $q->where('role', $role))
             ->count();
+        $departments[$role] = [
+            'name' => $name,
+            'total' => $total,
+            'hadir' => $hadir,
+            'percentage' => $total > 0 ? round(($hadir / $total) * 100) : 0,
+        ];
+    }
+    
+    // ============================================================
+    // 3. GRAFIK KEHADIRAN (7 Hari Terakhir) - KONSISTEN
+    // ============================================================
+    
+    $attendanceChart = [];
+    for ($i = 6; $i >= 0; $i--) {
+        $date = Carbon::today('Asia/Jakarta')->subDays($i);
+        $dateString = $date->toDateString();
         
-        $totalTerlambat = Attendance::whereDate('date', $today->toDateString())
-            ->where('status', 'terlambat')
-            ->count();
-
-        $pegawaiIdsWithAttendance = Attendance::whereDate('date', $today->toDateString())
+        // Dapatkan user yang hadir (check_in) pada tanggal ini
+        $hadirIdsDate = Attendance::whereDate('date', $dateString)
             ->whereNotNull('check_in')
             ->pluck('user_id')
             ->toArray();
-
-        $totalAlpha = User::whereNotIn('role', ['admin', 'manager'])
-            ->whereNotIn('id', $pegawaiIdsWithAttendance)
+        
+        // Dapatkan user yang izin/sakit pada tanggal ini
+        $izinSakitIdsDate = Pengajuan::where('status', 'disetujui')
+            ->where(function($q) use ($date) {
+                $q->whereDate('tanggal_mulai', '<=', $date)
+                  ->whereDate('tanggal_selesai', '>=', $date);
+            })
+            ->pluck('user_id')
+            ->toArray();
+        
+        // Hitung statistik
+        $hadir = count($hadirIdsDate);
+        $terlambat = Attendance::whereDate('date', $dateString)
+            ->where('status', 'terlambat')
             ->count();
-
-        $produksiHariIni = CatatanPanen::whereDate('tanggal', $today->toDateString())
-            ->sum('berat_kg') ?? 0;
-
-        $totalHadirDanTerlambat = $hadirHariIni;
-        $rateKehadiran = $totalPegawai > 0 ? round(($totalHadirDanTerlambat / $totalPegawai) * 100) : 0;
-
-        $recentActivities = Attendance::with('user')
-            ->whereDate('date', $today->toDateString())
-            ->whereNotNull('check_in')
-            ->orderBy('check_in', 'desc')
-            ->limit(5)
-            ->get();
-
-        $roles = [
-            'user' => 'Kebun & Panen',
-            'security' => 'Security',
-            'cleaning' => 'Cleaning',
-            'kantoran' => 'Administrasi',
-            'mandor' => 'Mandor',
+        
+        $izin = Pengajuan::where('status', 'disetujui')
+            ->where('jenis', 'izin')
+            ->whereDate('tanggal_mulai', '<=', $date)
+            ->whereDate('tanggal_selesai', '>=', $date)
+            ->count();
+        
+        $sakit = Pengajuan::where('status', 'disetujui')
+            ->where('jenis', 'sakit')
+            ->whereDate('tanggal_mulai', '<=', $date)
+            ->whereDate('tanggal_selesai', '>=', $date)
+            ->count();
+        
+        // Alpha = Total Pegawai - (Hadir + Izin + Sakit)
+        $totalPegawaiHari = User::whereNotIn('role', ['admin', 'manager'])->count();
+        $totalHadirIzinSakitDate = count(array_unique(array_merge($hadirIdsDate, $izinSakitIdsDate)));
+        $alpha = $totalPegawaiHari - $totalHadirIzinSakitDate;
+        
+        $attendanceChart[] = [
+            'tanggal' => $date->format('d/m'),
+            'hadir' => $hadir,
+            'terlambat' => $terlambat,
+            'izin' => $izin,
+            'sakit' => $sakit,
+            'alpha' => $alpha > 0 ? $alpha : 0,
         ];
-        $departments = [];
-
-        foreach ($roles as $role => $name) {
-            $total = User::where('role', $role)->count();
-            $hadir = Attendance::whereDate('date', $today->toDateString())
-                ->whereNotNull('check_in')
-                ->whereHas('user', fn($q) => $q->where('role', $role))
-                ->count();
-            $departments[$role] = [
-                'name' => $name,
-                'total' => $total,
-                'hadir' => $hadir,
-                'percentage' => $total > 0 ? round(($hadir / $total) * 100) : 0,
-            ];
-        }
-
-        return view('admin.dashboard', compact(
-            'totalPegawai',
-            'hadirHariIni',
-            'produksiHariIni',
-            'rateKehadiran',
-            'recentActivities',
-            'departments',
-            'totalTerlambat',
-            'totalAlpha'
-        ));
     }
+    
+    // ============================================================
+    // 4. GRAFIK KINERJA CLEANING (7 Hari Terakhir)
+    // ============================================================
+    
+    $cleaningChart = [];
+    for ($i = 6; $i >= 0; $i--) {
+        $date = Carbon::today('Asia/Jakarta')->subDays($i);
+        $dateString = $date->toDateString();
+        
+        $totalLaporan = KinerjaCleaning::whereDate('tanggal', $dateString)->count();
+        $totalArea = KinerjaCleaning::whereDate('tanggal', $dateString)
+            ->distinct('area')
+            ->count('area');
+        $totalPekerja = KinerjaCleaning::whereDate('tanggal', $dateString)
+            ->distinct('user_id')
+            ->count('user_id');
+        
+        $cleaningChart[] = [
+            'tanggal' => $date->format('d/m'),
+            'total_laporan' => $totalLaporan,
+            'total_area' => $totalArea,
+            'total_pekerja' => $totalPekerja,
+        ];
+    }
+    
+    // ============================================================
+    // 5. GRAFIK PATROLI SECURITY (7 Hari Terakhir)
+    // ============================================================
+    
+    $patroliChart = [];
+    for ($i = 6; $i >= 0; $i--) {
+        $date = Carbon::today('Asia/Jakarta')->subDays($i);
+        $dateString = $date->toDateString();
+        
+        $totalPatroli = PatroliSecurity::whereDate('waktu_patroli', $dateString)->count();
+        $totalArea = PatroliSecurity::whereDate('waktu_patroli', $dateString)
+            ->distinct('nama_area')
+            ->count('nama_area');
+        $totalPekerja = PatroliSecurity::whereDate('waktu_patroli', $dateString)
+            ->distinct('user_id')
+            ->count('user_id');
+        
+        $patroliChart[] = [
+            'tanggal' => $date->format('d/m'),
+            'total_patroli' => $totalPatroli,
+            'total_area' => $totalArea,
+            'total_pekerja' => $totalPekerja,
+        ];
+    }
+    
+    // ============================================================
+    // 6. GRAFIK PRODUKSI PANEN (7 Hari Terakhir)
+    // ============================================================
+    
+    $panenChart = [];
+    for ($i = 6; $i >= 0; $i--) {
+        $date = Carbon::today('Asia/Jakarta')->subDays($i);
+        $dateString = $date->toDateString();
+        
+        $totalBerat = LaporanPanen::whereDate('tanggal', $dateString)->sum('total_berat_kg');
+        $totalTandan = LaporanPanen::whereDate('tanggal', $dateString)->sum('total_tandan');
+        $totalBrondolan = LaporanPanen::whereDate('tanggal', $dateString)->sum('brondolan_kg');
+        $totalPekerja = LaporanPanen::whereDate('tanggal', $dateString)
+            ->distinct('pekerja_id')
+            ->count('pekerja_id');
+        
+        $panenChart[] = [
+            'tanggal' => $date->format('d/m'),
+            'total_berat' => round($totalBerat, 1),
+            'total_tandan' => $totalTandan,
+            'total_brondolan' => round($totalBrondolan, 1),
+            'total_pekerja' => $totalPekerja,
+        ];
+    }
+    
+    // ============================================================
+    // 7. STATISTIK BULANAN (Ringkasan)
+    // ============================================================
+    
+    $monthlyStats = [
+        'total_kehadiran' => Attendance::whereMonth('date', $today->month)
+            ->whereNotNull('check_in')
+            ->count(),
+        'total_izin_sakit' => Pengajuan::where('status', 'disetujui')
+            ->whereMonth('tanggal_mulai', $today->month)
+            ->count(),
+        'total_panen' => round(LaporanPanen::whereMonth('tanggal', $today->month)->sum('total_berat_kg'), 1),
+        'total_tandan' => LaporanPanen::whereMonth('tanggal', $today->month)->sum('total_tandan'),
+        'total_cleaning' => KinerjaCleaning::whereMonth('tanggal', $today->month)->count(),
+        'total_patroli' => PatroliSecurity::whereMonth('waktu_patroli', $today->month)->count(),
+    ];
+    
+    // ============================================================
+    // 8. DATA TERBARU (Recent Updates)
+    // ============================================================
+    
+    $recentCleaning = KinerjaCleaning::with('user')
+        ->orderBy('created_at', 'desc')
+        ->limit(5)
+        ->get();
+    
+    $recentPatroli = PatroliSecurity::with('user')
+        ->orderBy('waktu_patroli', 'desc')
+        ->limit(5)
+        ->get();
+    
+    $recentPanen = LaporanPanen::with('pekerja')
+        ->orderBy('created_at', 'desc')
+        ->limit(5)
+        ->get();
+    
+    // ============================================================
+    // 9. RATING & TREND
+    // ============================================================
+    
+    // Trend kehadiran (bandingkan dengan minggu lalu)
+    $lastWeekStart = Carbon::today('Asia/Jakarta')->subDays(14);
+    $lastWeekEnd = Carbon::today('Asia/Jakarta')->subDays(7);
+    
+    $lastWeekHadirIds = Attendance::whereBetween('date', [$lastWeekStart, $lastWeekEnd])
+        ->whereNotNull('check_in')
+        ->select('user_id', 'date')
+        ->distinct()
+        ->get()
+        ->groupBy('user_id')
+        ->count();
+    
+    $trendKehadiran = $lastWeekHadirIds > 0 
+        ? round((($hadirHariIni - $lastWeekHadirIds) / $lastWeekHadirIds) * 100) 
+        : 0;
+    
+    // ============================================================
+    // 10. DEBUG (Hanya untuk development - hapus jika production)
+    // ============================================================
+    
+    // Log untuk memastikan konsistensi data
+    \Illuminate\Support\Facades\Log::info('Dashboard Stats - Today: ' . $today->toDateString(), [
+        'total_pegawai' => $totalPegawai,
+        'hadir' => $hadirHariIni,
+        'terlambat' => $totalTerlambat,
+        'izin' => $izinHariIni,
+        'sakit' => $sakitHariIni,
+        'alpha' => $totalAlpha,
+        'alpha_from_chart' => $attendanceChart[6]['alpha'] ?? 'N/A', // Hari ini adalah index ke-6
+        'verifikasi' => ($totalAlpha == ($attendanceChart[6]['alpha'] ?? -1)) ? 'KONSISTEN' : 'TIDAK KONSISTEN'
+    ]);
+    
+    // ============================================================
+    // 11. RETURN VIEW
+    // ============================================================
+    
+    return view('admin.dashboard', compact(
+        // Statistik Utama
+        'totalPegawai',
+        'hadirHariIni',
+        'totalTerlambat',
+        'totalAlpha',
+        'izinHariIni',
+        'sakitHariIni',
+        'produksiHariIni',
+        'totalTandanHariIni',
+        'rateKehadiran',
+        'trendKehadiran',
+        
+        // Data Tabel
+        'recentActivities',
+        'departments',
+        
+        // Grafik Chart
+        'attendanceChart',
+        'cleaningChart',
+        'patroliChart',
+        'panenChart',
+        
+        // Statistik Bulanan
+        'monthlyStats',
+        
+        // Recent Updates
+        'recentCleaning',
+        'recentPatroli',
+        'recentPanen'
+    ));
+}
 
 public function mandorDashboard()
 {
@@ -578,7 +844,7 @@ public function mandorDashboard()
                 
                 if (!$hasPanen) {
                     return redirect()->back()->with('error', 
-                        '⚠️ Anda belum menginput panen hari ini! Silakan input panen terlebih dahulu melalui menu "Input Panen Sawit" sebelum checkout.'
+                        'Anda belum menginput panen hari ini! Silakan input panen terlebih dahulu melalui menu "Input Panen Sawit" sebelum checkout.'
                     );
                 }
                 break;
@@ -590,7 +856,7 @@ public function mandorDashboard()
                 
                 if (!$hasKinerja) {
                     return redirect()->back()->with('error', 
-                        '⚠️ Anda belum menginput kinerja cleaning hari ini! Silakan input kinerja terlebih dahulu melalui menu "Input Kinerja Cleaning" sebelum checkout.'
+                        'Anda belum menginput kinerja cleaning hari ini! Silakan input kinerja terlebih dahulu melalui menu "Input Kinerja Cleaning" sebelum checkout.'
                     );
                 }
                 break;
@@ -602,7 +868,7 @@ public function mandorDashboard()
                 
                 if (!$hasPatroli) {
                     return redirect()->back()->with('error', 
-                        '⚠️ Anda belum menginput laporan patroli hari ini! Silakan input patroli terlebih dahulu melalui menu "Input Patroli" sebelum checkout.'
+                        'Anda belum menginput laporan patroli hari ini! Silakan input patroli terlebih dahulu melalui menu "Input Patroli" sebelum checkout.'
                     );
                 }
                 break;
@@ -621,7 +887,7 @@ public function mandorDashboard()
         
         if (!$sudahVerifikasi) {
             return redirect()->back()->with('error', 
-                '⚠️ ANDA BELUM BISA CHECKOUT! ⚠️<br><br>' .
+                ' ANDA BELUM BISA CHECKOUT! <br><br>' .
                 'Anda harus memverifikasi laporan panen terlebih dahulu sebelum checkout.<br><br>' .
                 'Silakan klik menu <strong>"Laporan Panen"</strong> untuk verifikasi laporan panen.'
             );
@@ -646,7 +912,7 @@ public function mandorDashboard()
             'total_hours' => $totalHours
         ]);
         
-        $successMessage = '✅ Checkout berhasil! ';
+        $successMessage = ' Checkout berhasil! ';
         switch ($user->role) {
             case 'user':
                 $successMessage .= 'Terima kasih telah input panen hari ini.';
@@ -745,7 +1011,7 @@ public function mandorDashboard()
         
         if (!$sudahVerifikasi) {
             return redirect()->back()->with('error', 
-                '⚠️ ANDA BELUM BISA CHECKOUT! ⚠️<br><br>' .
+                ' ANDA BELUM BISA CHECKOUT! <br><br>' .
                 'Anda harus memverifikasi laporan panen terlebih dahulu sebelum checkout.<br><br>' .
                 'Silakan klik menu <strong>"Laporan Panen"</strong> untuk verifikasi laporan panen.'
             );

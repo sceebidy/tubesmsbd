@@ -57,10 +57,8 @@ class PengajuanController extends Controller
         
         if ($sudahCheckIn) {
             return back()->with('error', 
-                '❌ TIDAK BISA MENGAJUKAN IZIN/SAKIT! ❌' . "\n\n" .
-                'Anda sudah melakukan check in di salah satu tanggal yang diajukan. ' .
-                'Pengajuan izin/sakit hanya bisa dilakukan untuk tanggal yang belum Anda check in. ' .
-                'Silakan pilih tanggal lain yang belum Anda check in.'
+                'TIDAK BISA MENGAJUKAN IZIN/SAKIT! ANDA SUDAH CHECK IN' . "\n\n" 
+               
             );
         }
         
@@ -74,10 +72,9 @@ class PengajuanController extends Controller
         
         if ($sudahAbsen) {
             return back()->with('error', 
-                '❌ TIDAK BISA MENGAJUKAN IZIN/SAKIT! ❌' . "\n\n" .
-                'Anda sudah memiliki absensi (hadir/terlambat/alpa) di salah satu tanggal yang diajukan. ' .
-                'Pengajuan izin/sakit hanya bisa dilakukan untuk tanggal yang belum Anda absen. ' .
-                'Silakan pilih tanggal lain yang belum Anda absen.'
+                'TIDAK BISA MENGAJUKAN IZIN/SAKIT! ' . "\n\n" .
+                'Anda sudah memiliki absensi (hadir/terlambat/alpa) di salah satu tanggal yang diajukan. ' 
+                
             );
         }
         

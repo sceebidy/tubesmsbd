@@ -171,7 +171,7 @@ class LaporanPanenController extends Controller
             
             if (!$sudahCheckIn) {
                 return redirect()->route('mandor.panen')
-                    ->with('error', '⚠️ ANDA BELUM CHECK IN! ⚠️<br><br>Anda harus check in terlebih dahulu sebelum dapat memverifikasi panen.');
+                    ->with('error', ' ANDA BELUM CHECK IN! <br><br>Anda harus check in terlebih dahulu sebelum dapat memverifikasi panen.');
             }
             
             // ============================================================
@@ -185,7 +185,7 @@ class LaporanPanenController extends Controller
             
             if ($isIzinHariIni) {
                 return redirect()->route('mandor.panen')
-                    ->with('error', '⚠️ Anda sedang IZIN/SAKIT hari ini. Tidak dapat memverifikasi panen.');
+                    ->with('error', ' Anda sedang IZIN/SAKIT hari ini. Tidak dapat memverifikasi panen.');
             }
             
             // ============================================================
@@ -198,7 +198,7 @@ class LaporanPanenController extends Controller
             
             if ($sudahVerifikasiHariIni) {
                 return redirect()->route('mandor.panen')
-                    ->with('error', '⚠️ Anda sudah melakukan verifikasi panen hari ini. Hanya diperbolehkan 1 kali verifikasi per hari.');
+                    ->with('error', ' Anda sudah melakukan verifikasi panen hari ini. Hanya diperbolehkan 1 kali verifikasi per hari.');
             }
             
             // ============================================================
@@ -220,11 +220,11 @@ class LaporanPanenController extends Controller
             
             if ($updated) {
                 return redirect()->route('mandor.panen')
-                    ->with('success', '✅ Laporan panen berhasil diverifikasi!');
+                    ->with('success', ' Laporan panen berhasil diverifikasi!');
             }
             
             return redirect()->route('mandor.panen')
-                ->with('error', '⚠️ Gagal memverifikasi laporan panen.');
+                ->with('error', ' Gagal memverifikasi laporan panen.');
                 
         } catch (\Exception $e) {
             \Log::error('Verifikasi Mandor Error: ' . $e->getMessage());
@@ -247,7 +247,7 @@ class LaporanPanenController extends Controller
             // ============================================================
             if (is_null(Auth::user()->mandor_id)) {
                 return redirect()->route('user.panen')
-                    ->with('error', '⚠️ ANDA BELUM MEMILIKI MANDOR! ⚠️<br><br>' .
+                    ->with('error', ' ANDA BELUM MEMILIKI MANDOR! <br><br>' .
                         'Anda tidak dapat menginput panen karena belum memiliki mandor.<br><br>' .
                         'Silakan hubungi administrator untuk ditugaskan ke mandor terlebih dahulu.');
             }
@@ -263,7 +263,7 @@ class LaporanPanenController extends Controller
             
             if ($isIzinHariIni) {
                 return redirect()->route('user.panen')
-                    ->with('error', '⚠️ Anda sedang IZIN/SAKIT hari ini. Tidak dapat menginput panen.');
+                    ->with('error', ' Anda sedang IZIN/SAKIT hari ini. Tidak dapat menginput panen.');
             }
             
             // ============================================================
@@ -276,7 +276,7 @@ class LaporanPanenController extends Controller
             
             if (!$sudahCheckIn) {
                 return redirect()->route('user.panen')
-                    ->with('error', '⚠️ ANDA BELUM CHECK IN! ⚠️<br><br>Anda harus check in terlebih dahulu sebelum menginput panen.');
+                    ->with('error', ' ANDA BELUM CHECK IN! <br><br>Anda harus check in terlebih dahulu sebelum menginput panen.');
             }
             
             // ============================================================
@@ -288,7 +288,7 @@ class LaporanPanenController extends Controller
             
             if ($sudahInputHariIni) {
                 return redirect()->route('user.panen')
-                    ->with('error', '⚠️ Anda sudah menginput panen hari ini. Hanya diperbolehkan 1 kali input per hari.');
+                    ->with('error', ' Anda sudah menginput panen hari ini. Hanya diperbolehkan 1 kali input per hari.');
             }
             
             // ============================================================
@@ -304,7 +304,7 @@ class LaporanPanenController extends Controller
             
             if ($mandorSudahVerifikasi) {
                 return redirect()->route('user.panen')
-                    ->with('error', '⚠️ Mandor Anda sudah memverifikasi laporan panen hari ini. Tidak dapat menginput panen setelah verifikasi.');
+                    ->with('error', ' Mandor Anda sudah memverifikasi laporan panen hari ini. Tidak dapat menginput panen setelah verifikasi.');
             }
             
             // ============================================================
@@ -328,7 +328,7 @@ class LaporanPanenController extends Controller
             ]);
             
             return redirect()->route('user.panen')
-                ->with('success', '✅ Data panen berhasil disimpan!');
+                ->with('success', ' Data panen berhasil disimpan!');
                 
         } catch (\Exception $e) {
             \Log::error('Store Panen Error: ' . $e->getMessage());
