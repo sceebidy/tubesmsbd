@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Announcement;
+use App\Models\User;
 use App\Events\NewAnnouncementEvent;
 
 class AnnouncementController extends Controller
@@ -12,22 +13,36 @@ class AnnouncementController extends Controller
     public function indexAdmin()
     {
         $announcements = Announcement::latest()->get();
-        return view('pengumuman.admin', compact('announcements'));
+        $pegawaiList   = User::whereNotIn('role', ['admin', 'manager'])
+                             ->orderBy('name')
+                             ->get();
+
+        return view('pengumuman.admin', compact('announcements', 'pegawaiList'));
     }
 
     public function store(Request $request)
     {
         $request->validate([
-            'judul' => 'required|string|max:255',
-            'isi' => 'required|string',
+            'judul'        => 'required|string|max:255',
+            'isi'          => 'required|string',
+            'target_type'  => 'required|in:all,specific',
+            'target_users' => 'required_if:target_type,specific|array|min:1',
+            'target_users.*' => 'exists:users,id',
+        ], [
+            'target_users.required_if' => 'Pilih minimal satu pegawai yang dituju.',
         ]);
+
+        $targetUsers = $request->target_type === 'specific'
+            ? $request->target_users
+            : null;
 
         $announcement = Announcement::create([
-            'judul' => $request->judul,
-            'isi' => $request->isi,
+            'judul'        => $request->judul,
+            'isi'          => $request->isi,
+            'created_by'   => auth()->id(),
+            'target_users' => $targetUsers ? json_encode($targetUsers) : null,
         ]);
 
-        // Untuk development, gunakan broadcast() bukan event() untuk hindari queue
         broadcast(new NewAnnouncementEvent($announcement))->toOthers();
 
         return back()->with('success', 'Pengumuman berhasil ditambahkan!');
@@ -44,7 +59,24 @@ class AnnouncementController extends Controller
     // =================== USER ===================
     public function showToUsers()
     {
-        $announcements = Announcement::latest()->get();
+        $userId = auth()->id();
+
+        // Tampilkan pengumuman yang ditujukan ke semua (target_users null)
+        // ATAU yang target_users-nya mengandung ID user ini
+        $announcements = Announcement::latest()
+            ->get()
+            ->filter(function ($a) use ($userId) {
+                if (is_null($a->target_users)) {
+                    return true; // siaran umum
+                }
+                $targets = is_array($a->target_users)
+                    ? $a->target_users
+                    : json_decode($a->target_users, true);
+
+                return in_array($userId, (array) $targets);
+            })
+            ->values();
+
         return view('pengumuman.user', compact('announcements'));
     }
 
@@ -52,22 +84,36 @@ class AnnouncementController extends Controller
     public function indexManager()
     {
         $announcements = Announcement::latest()->get();
-        return view('pengumuman.manager', compact('announcements'));
+        $pegawaiList   = User::whereNotIn('role', ['admin', 'manager'])
+                             ->orderBy('name')
+                             ->get();
+
+        return view('pengumuman.manager', compact('announcements', 'pegawaiList'));
     }
 
     public function storeManager(Request $request)
     {
         $request->validate([
-            'judul' => 'required|string|max:255',
-            'isi' => 'required|string',
+            'judul'        => 'required|string|max:255',
+            'isi'          => 'required|string',
+            'target_type'  => 'required|in:all,specific',
+            'target_users' => 'required_if:target_type,specific|array|min:1',
+            'target_users.*' => 'exists:users,id',
+        ], [
+            'target_users.required_if' => 'Pilih minimal satu pegawai yang dituju.',
         ]);
+
+        $targetUsers = $request->target_type === 'specific'
+            ? $request->target_users
+            : null;
 
         $announcement = Announcement::create([
-            'judul' => $request->judul,
-            'isi' => $request->isi,
+            'judul'        => $request->judul,
+            'isi'          => $request->isi,
+            'created_by'   => auth()->id(),
+            'target_users' => $targetUsers ? json_encode($targetUsers) : null,
         ]);
 
-        // Broadcast juga untuk manager
         broadcast(new NewAnnouncementEvent($announcement))->toOthers();
 
         return back()->with('success', 'Pengumuman berhasil ditambahkan!');
