@@ -193,7 +193,7 @@
 
             {{-- No HP --}}
             <div class="form-group">
-                <label class="field-label" for="no_hp">Nomor HP / Username</label>
+                <label class="field-label" for="no_hp">Username / No HP</label>
                 <div class="input-wrapper">
                     <svg class="input-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
@@ -202,7 +202,7 @@
                         id="no_hp" type="text" name="no_hp"
                         value="{{ old('no_hp') }}"
                         required autofocus autocomplete="tel"
-                        placeholder="Masukkan username / No HP"
+                        placeholder="Masukkan Username / No HP"
                         oninput="validateNoHP(this)"
                         class="input-field @error('no_hp') border-red-400 @enderror">
                 </div>

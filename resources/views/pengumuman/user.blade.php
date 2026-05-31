@@ -2,15 +2,24 @@
 
 @section('content')
 <div class="bg-gray-50 min-h-screen p-6 md:p-8">
-    <div class="max-w-3xl mx-auto">
+    <div class="container mx-auto px-4 sm:px-6 lg:px-8">
 
-        {{-- Header --}}
+        {{-- ============================================================ --}}
+        {{-- HEADER DENGAN IKON MEGAPHONE (PENGUMUMAN) --}}
+        {{-- ============================================================ --}}
         <div class="mb-8 pb-5 border-b border-gray-200">
             <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
-                <div>
-                    <p class="text-sm text-gray-500 uppercase tracking-wide mb-1">Informasi</p>
-                    <h1 class="text-2xl md:text-3xl font-bold text-[#2c5e4e]">Pengumuman</h1>
-                    <p class="text-sm text-gray-500 mt-1">Informasi terbaru untuk Anda</p>
+                <div class="flex items-center gap-4">
+                    <div class="w-14 h-14 bg-[#eaf4f1] rounded-2xl flex items-center justify-center flex-shrink-0">
+                        <svg class="w-8 h-8 text-[#2c5e4e]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5.882V19.24a1.76 1.76 0 01-3.417.592l-2.147-6.15M18 13a3 3 0 100-6M5.436 13.683A4.001 4.001 0 017 6h1.832c4.1 0 7.625-1.234 9.168-3v14c-1.543-1.766-5.067-3-9.168-3H7a3.988 3.988 0 01-1.564-.317z"/>
+                        </svg>
+                    </div>
+                    <div>
+                    
+                        <h1 class="text-2xl md:text-3xl font-bold text-[#2c5e4e]">Pengumuman</h1>
+                        <p class="text-sm text-gray-500 mt-1">Informasi terbaru untuk Anda</p>
+                    </div>
                 </div>
                 <span class="inline-block px-4 py-1.5 bg-[#eaf4f1] text-[#2c5e4e] rounded-full text-sm font-medium self-start sm:self-center">
                     PT. Sipirok Indah
@@ -18,17 +27,59 @@
             </div>
         </div>
 
-        {{-- List Pengumuman --}}
+        {{-- ============================================================ --}}
+        {{-- ALERT MESSAGES --}}
+        {{-- ============================================================ --}}
+        @if(session('success'))
+        <div class="mb-4 md:mb-5 p-3 md:p-4 rounded-xl bg-[#e8f5f0] border border-[#2e7d5e]/20 flex items-center gap-3">
+            <svg class="w-5 h-5 text-[#2e7d5e] flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+            </svg>
+            <p class="text-sm md:text-base text-[#1f4a3d]">{{ session('success') }}</p>
+        </div>
+        @endif
+
+        @if(session('error'))
+        <div class="mb-4 md:mb-5 p-3 md:p-4 rounded-xl bg-[#FDECEA] border border-[#C0392B]/20 flex items-center gap-3">
+            <svg class="w-5 h-5 text-[#C0392B] flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+            </svg>
+            <p class="text-sm md:text-base text-[#7B1C14]">{{ session('error') }}</p>
+        </div>
+        @endif
+
+        @if(session('warning'))
+        <div class="mb-4 md:mb-5 p-3 md:p-4 rounded-xl bg-amber-50 border border-amber-200 flex items-center gap-3">
+            <svg class="w-5 h-5 text-amber-600 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
+            </svg>
+            <div class="flex-1">
+                <p class="font-semibold text-amber-800 text-sm">Peringatan</p>
+                <p class="text-sm text-amber-700">{!! session('warning') !!}</p>
+            </div>
+        </div>
+        @endif
+
+        {{-- ============================================================ --}}
+        {{-- LIST PENGUMUMAN --}}
+        {{-- ============================================================ --}}
         @if($announcements->count())
         <div class="space-y-4">
-            @foreach($announcements as $a)
-            @php $isPersonal = !is_null($a->target_users); @endphp
+            @foreach($announcements as $announcement)
+            @php $isPersonal = !is_null($announcement->target_users); @endphp
             <div class="bg-white rounded-2xl p-5 md:p-6 border shadow-sm transition-all duration-200 hover:shadow-md hover:-translate-y-0.5
                 {{ $isPersonal ? 'border-amber-200 hover:border-amber-300' : 'border-gray-200 hover:border-[#d0e9e3]' }}">
 
                 {{-- Title row --}}
                 <div class="flex items-start justify-between gap-3 mb-3">
-                    <h3 class="text-base font-semibold text-gray-800 leading-snug">{{ $a->judul }}</h3>
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-xl bg-[#eaf4f1] flex items-center justify-center flex-shrink-0">
+                            <svg class="w-5 h-5 text-[#2c5e4e]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5.882V19.24a1.76 1.76 0 01-3.417.592l-2.147-6.15M18 13a3 3 0 100-6M5.436 13.683A4.001 4.001 0 017 6h1.832c4.1 0 7.625-1.234 9.168-3v14c-1.543-1.766-5.067-3-9.168-3H7a3.988 3.988 0 01-1.564-.317z"/>
+                            </svg>
+                        </div>
+                        <h3 class="text-base font-semibold text-gray-800 leading-snug">{{ $announcement->judul }}</h3>
+                    </div>
                     @if($isPersonal)
                     <span class="flex-shrink-0 inline-flex items-center gap-1 bg-amber-50 text-amber-800 border border-amber-200 px-2.5 py-1 rounded-full text-xs font-semibold">
                         <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
@@ -41,15 +92,34 @@
 
                 <div class="h-px {{ $isPersonal ? 'bg-amber-100' : 'bg-[#eaf4f1]' }} my-3 rounded-full"></div>
 
-                <p class="text-sm text-gray-600 leading-relaxed mb-4">{{ $a->isi }}</p>
+                <p class="text-sm text-gray-600 leading-relaxed mb-4">{{ $announcement->isi }}</p>
 
-                <div class="flex justify-end">
-                    <span class="inline-flex items-center gap-1.5 bg-gray-100 px-3 py-1.5 rounded-full text-xs font-medium text-gray-500">
+                <div class="flex flex-wrap justify-between items-center gap-3">
+                    <div class="flex items-center gap-2">
+                        <span class="inline-flex items-center gap-1.5 bg-gray-100 px-3 py-1.5 rounded-full text-xs font-medium text-gray-500">
+                            <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                            </svg>
+                            {{ $announcement->created_at->diffForHumans() }}
+                        </span>
+                        @if($announcement->created_at != $announcement->updated_at)
+                        <span class="inline-flex items-center gap-1.5 bg-gray-100 px-3 py-1.5 rounded-full text-xs font-medium text-gray-400">
+                            <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
+                            </svg>
+                            Diperbarui
+                        </span>
+                        @endif
+                    </div>
+                    
+                    @if($isPersonal)
+                    <span class="inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium bg-[#eaf4f1] text-[#2c5e4e]">
                         <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
                         </svg>
-                        {{ $a->created_at->diffForHumans() }}
+                        Personal
                     </span>
+                    @endif
                 </div>
             </div>
             @endforeach
@@ -58,7 +128,7 @@
         <div class="bg-white rounded-2xl py-12 px-4 text-center border border-gray-200">
             <div class="w-14 h-14 bg-gray-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
                 <svg class="w-7 h-7 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z"/>
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5.882V19.24a1.76 1.76 0 01-3.417.592l-2.147-6.15M18 13a3 3 0 100-6M5.436 13.683A4.001 4.001 0 017 6h1.832c4.1 0 7.625-1.234 9.168-3v14c-1.543-1.766-5.067-3-9.168-3H7a3.988 3.988 0 01-1.564-.317z"/>
                 </svg>
             </div>
             <p class="font-semibold text-gray-500 text-sm mb-1">Belum ada pengumuman</p>

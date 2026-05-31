@@ -2,22 +2,66 @@
 
 @section('content')
 <div class="bg-gray-50 min-h-screen p-6 md:p-8">
-    <div class="max-w-5xl mx-auto">
+    <div class="container mx-auto px-4 sm:px-6 lg:px-8">
 
-        {{-- Header --}}
+        {{-- ============================================================ --}}
+        {{-- HEADER DENGAN IKON POHON CEMARA --}}
+        {{-- ============================================================ --}}
         <div class="mb-8 pb-5 border-b border-gray-200">
             <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
-                <div>
-                    <p class="text-sm text-gray-500 uppercase tracking-wide mb-1">Karyawan</p>
-                    <h1 class="text-2xl md:text-3xl font-bold text-[#2c5e4e]">Evaluasi Kinerja Saya</h1>
-                    <p class="text-sm text-gray-500 mt-1">Rekap evaluasi kinerja berdasarkan periode penilaian</p>
-                </div>
+              <div class="flex items-center gap-4">
+    <div class="w-14 h-14 bg-[#eaf4f1] rounded-2xl flex items-center justify-center flex-shrink-0">
+        <svg class="w-8 h-8 text-[#2c5e4e]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 4v12l-4-2-4 2V4M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+        </svg>
+    </div>
+    <div>
+        <h1 class="text-2xl md:text-3xl font-bold text-[#2c5e4e]">Evaluasi Kinerja Saya</h1>
+        <p class="text-sm text-gray-500 mt-1">Rekap evaluasi kinerja berdasarkan periode penilaian</p>
+    </div>
+</div>
                 <span class="inline-block px-4 py-1.5 bg-[#eaf4f1] text-[#2c5e4e] rounded-full text-sm font-medium self-start sm:self-center">
                     PT. Sipirok Indah
                 </span>
             </div>
         </div>
 
+        {{-- ============================================================ --}}
+        {{-- ALERT MESSAGES --}}
+        {{-- ============================================================ --}}
+        @if(session('success'))
+        <div class="mb-4 md:mb-5 p-3 md:p-4 rounded-xl bg-[#e8f5f0] border border-[#2e7d5e]/20 flex items-center gap-3">
+            <svg class="w-5 h-5 text-[#2e7d5e] flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+            </svg>
+            <p class="text-sm md:text-base text-[#1f4a3d]">{{ session('success') }}</p>
+        </div>
+        @endif
+
+        @if(session('error'))
+        <div class="mb-4 md:mb-5 p-3 md:p-4 rounded-xl bg-[#FDECEA] border border-[#C0392B]/20 flex items-center gap-3">
+            <svg class="w-5 h-5 text-[#C0392B] flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+            </svg>
+            <p class="text-sm md:text-base text-[#7B1C14]">{{ session('error') }}</p>
+        </div>
+        @endif
+
+        @if(session('warning'))
+        <div class="mb-4 md:mb-5 p-3 md:p-4 rounded-xl bg-amber-50 border border-amber-200 flex items-center gap-3">
+            <svg class="w-5 h-5 text-amber-600 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
+            </svg>
+            <div class="flex-1">
+                <p class="font-semibold text-amber-800 text-sm">Peringatan</p>
+                <p class="text-sm text-amber-700">{!! session('warning') !!}</p>
+            </div>
+        </div>
+        @endif
+
+        {{-- ============================================================ --}}
+        {{-- KONTEN UTAMA --}}
+        {{-- ============================================================ --}}
         @if($rapots->isEmpty())
         <div class="bg-white rounded-2xl p-10 text-center border border-gray-200 shadow-sm">
             <svg class="w-12 h-12 mx-auto mb-4 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">

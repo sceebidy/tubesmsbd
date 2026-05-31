@@ -14,7 +14,6 @@
                         </svg>
                     </div>
                     <div>
-                        <p class="text-xs text-gray-500 uppercase tracking-wide mb-0.5">Pengajuan</p>
                         <h1 class="text-xl md:text-3xl font-bold text-[#2c5e4e]">Izin / Sakit</h1>
                         <p class="text-xs text-gray-500 mt-0.5">Ajukan izin atau sakit secara online</p>
                     </div>
@@ -49,9 +48,33 @@
         </div>
         @endif
 
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            
-            {{-- FORM PENGAJUAN --}}
+        {{-- TAB NAVIGATION --}}
+        <div class="mb-6">
+            <div class="flex border-b border-gray-200">
+                <button id="tabPengajuanBtn" class="tab-button py-3 px-6 font-semibold text-sm transition-all duration-200 border-b-2 border-[#2c5e4e] text-[#2c5e4e]">
+                    <div class="flex items-center gap-2">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+                        </svg>
+                        Form Pengajuan
+                    </div>
+                </button>
+                <button id="tabRiwayatBtn" class="tab-button py-3 px-6 font-semibold text-sm transition-all duration-200 border-b-2 border-transparent text-gray-500 hover:text-gray-700">
+                    <div class="flex items-center gap-2">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path>
+                        </svg>
+                        Riwayat Pengajuan
+                        <span class="bg-gray-200 text-gray-700 px-2 py-0.5 rounded-full text-xs">
+                            {{ $riwayatPengajuan->total() }}
+                        </span>
+                    </div>
+                </button>
+            </div>
+        </div>
+
+        {{-- TAB 1: FORM PENGAJUAN --}}
+        <div id="tabPengajuan" class="tab-content">
             <div class="bg-white rounded-xl md:rounded-2xl shadow-sm border border-[#E2E8F0] overflow-hidden">
                 <div class="px-5 md:px-7 py-4 md:py-5 border-b border-[#eaf4f1] bg-gradient-to-r from-[#2c5e4e] to-[#1f4a3d]">
                     <h2 class="text-base md:text-lg font-bold text-white">Form Pengajuan</h2>
@@ -146,8 +169,10 @@
                     
                 </div>
             </div>
-            
-            {{-- RIWAYAT PENGAJUAN --}}
+        </div>
+
+        {{-- TAB 2: RIWAYAT PENGAJUAN --}}
+        <div id="tabRiwayat" class="tab-content hidden">
             <div class="bg-white rounded-xl md:rounded-2xl shadow-sm border border-[#E2E8F0] overflow-hidden">
                 <div class="px-5 md:px-7 py-4 md:py-5 border-b border-[#eaf4f1] bg-gradient-to-r from-gray-50 to-gray-100">
                     <div class="flex items-center justify-between">
@@ -178,7 +203,7 @@
                                 </div>
                                 <div class="mt-2">
                                     <p class="text-sm font-medium text-gray-700">
-                                        📅 {{ \Carbon\Carbon::parse($item->tanggal_mulai)->format('d/m/Y') }} - {{ \Carbon\Carbon::parse($item->tanggal_selesai)->format('d/m/Y') }}
+                                         {{ \Carbon\Carbon::parse($item->tanggal_mulai)->format('d/m/Y') }} - {{ \Carbon\Carbon::parse($item->tanggal_selesai)->format('d/m/Y') }}
                                         <span class="text-xs text-gray-400 ml-1">({{ $item->jumlah_hari }} hari)</span>
                                     </p>
                                 </div>
@@ -233,7 +258,6 @@
                     @endif
                 </div>
             </div>
-            
         </div>
         
         {{-- INFO PANDUAN --}}
@@ -260,6 +284,40 @@
 </div>
 
 <script>
+// Tab switching
+const tabPengajuan = document.getElementById('tabPengajuan');
+const tabRiwayat = document.getElementById('tabRiwayat');
+const btnPengajuan = document.getElementById('tabPengajuanBtn');
+const btnRiwayat = document.getElementById('tabRiwayatBtn');
+
+function showTab(tab) {
+    if (tab === 'pengajuan') {
+        tabPengajuan.classList.remove('hidden');
+        tabRiwayat.classList.add('hidden');
+        btnPengajuan.classList.add('border-[#2c5e4e]', 'text-[#2c5e4e]');
+        btnPengajuan.classList.remove('border-transparent', 'text-gray-500');
+        btnRiwayat.classList.remove('border-[#2c5e4e]', 'text-[#2c5e4e]');
+        btnRiwayat.classList.add('border-transparent', 'text-gray-500');
+    } else {
+        tabPengajuan.classList.add('hidden');
+        tabRiwayat.classList.remove('hidden');
+        btnRiwayat.classList.add('border-[#2c5e4e]', 'text-[#2c5e4e]');
+        btnRiwayat.classList.remove('border-transparent', 'text-gray-500');
+        btnPengajuan.classList.remove('border-[#2c5e4e]', 'text-[#2c5e4e]');
+        btnPengajuan.classList.add('border-transparent', 'text-gray-500');
+    }
+}
+
+btnPengajuan.addEventListener('click', () => showTab('pengajuan'));
+btnRiwayat.addEventListener('click', () => showTab('riwayat'));
+
+// Cek hash URL untuk menentukan tab awal
+if (window.location.hash === '#riwayat') {
+    showTab('riwayat');
+} else {
+    showTab('pengajuan');
+}
+
 // Hitung jumlah hari otomatis
 const tanggalMulai = document.getElementById('tanggal_mulai');
 const tanggalSelesai = document.getElementById('tanggal_selesai');
@@ -273,32 +331,34 @@ function hitungJumlahHari() {
         const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1;
         
         if (diffDays > 30) {
-            jumlahHariInfo.innerHTML = '<span class="text-red-600">⚠️ Maksimal 30 hari, silakan perpendek rentang tanggal</span>';
+            jumlahHariInfo.innerHTML = '<span class="text-red-600"> Maksimal 30 hari, silakan perpendek rentang tanggal</span>';
         } else {
-            jumlahHariInfo.innerHTML = `Total hari: ${diffDays} hari`;
+            jumlahHariInfo.innerHTML = ` Total hari: ${diffDays} hari`;
         }
     }
 }
 
-tanggalMulai.addEventListener('change', hitungJumlahHari);
-tanggalSelesai.addEventListener('change', hitungJumlahHari);
-hitungJumlahHari();
+if (tanggalMulai && tanggalSelesai) {
+    tanggalMulai.addEventListener('change', hitungJumlahHari);
+    tanggalSelesai.addEventListener('change', hitungJumlahHari);
+    hitungJumlahHari();
 
-// Validasi tanggal selesai tidak boleh lebih kecil dari tanggal mulai
-tanggalSelesai.addEventListener('change', function() {
-    if (tanggalMulai.value && this.value && this.value < tanggalMulai.value) {
-        this.value = tanggalMulai.value;
-        hitungJumlahHari();
-        alert('Tanggal selesai tidak boleh lebih kecil dari tanggal mulai');
-    }
-});
+    // Validasi tanggal selesai tidak boleh lebih kecil dari tanggal mulai
+    tanggalSelesai.addEventListener('change', function() {
+        if (tanggalMulai.value && this.value && this.value < tanggalMulai.value) {
+            this.value = tanggalMulai.value;
+            hitungJumlahHari();
+            alert('Tanggal selesai tidak boleh lebih kecil dari tanggal mulai');
+        }
+    });
 
-tanggalMulai.addEventListener('change', function() {
-    if (tanggalSelesai.value && this.value > tanggalSelesai.value) {
-        tanggalSelesai.value = this.value;
-        hitungJumlahHari();
-        alert('Tanggal mulai tidak boleh lebih besar dari tanggal selesai');
-    }
-});
+    tanggalMulai.addEventListener('change', function() {
+        if (tanggalSelesai.value && this.value > tanggalSelesai.value) {
+            tanggalSelesai.value = this.value;
+            hitungJumlahHari();
+            alert('Tanggal mulai tidak boleh lebih besar dari tanggal selesai');
+        }
+    });
+}
 </script>
 @endsection

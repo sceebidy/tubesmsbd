@@ -364,7 +364,7 @@ class RapotController extends Controller
         $user->update(['last_evaluated_at' => now()]);
 
         return redirect()->route('admin.rapot.index')
-            ->with('success', "✅ Evaluasi kinerja untuk {$user->name} berhasil disimpan!");
+            ->with('success', " Evaluasi kinerja untuk {$user->name} berhasil disimpan!");
     }
 
     /**

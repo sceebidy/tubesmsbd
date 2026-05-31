@@ -9,9 +9,9 @@
             <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
                 <div class="flex items-center gap-3 md:gap-4">
                     <div class="w-10 h-10 md:w-14 md:h-14 bg-[#eaf4f1] rounded-xl md:rounded-2xl flex items-center justify-center flex-shrink-0">
-                        <svg class="w-5 h-5 md:w-8 md:h-8 text-[#2c5e4e]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"></path>
-                        </svg>
+                        <svg class="w-6 h-6 text-[#2c5e4e]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+</svg>
                     </div>
                     <div>
                         <p class="text-xs text-gray-500 uppercase tracking-wide mb-0.5">Cleaning Service</p>
@@ -59,26 +59,22 @@
                     </svg>
                 </div>
                 <div class="flex-1">
-                    <p class="font-semibold text-red-800 text-lg">Belum Melakukan Check-in!</p>
+                    <p class="font-semibold text-red-800 text-lg flex items-center gap-2">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                        Belum Melakukan Check-in!
+                    </p>
                     <p class="text-sm text-red-700 mt-1">
                         Anda harus melakukan CHECK-IN terlebih dahulu sebelum dapat menginput kinerja cleaning.
                         Silakan lakukan check-in melalui halaman absensi.
                     </p>
                 </div>
-                <div>
-                    <a href="{{ route('attendance.index') }}" 
-                       class="inline-flex items-center gap-2 bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg text-sm font-semibold transition-all">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1"></path>
-                        </svg>
-                        Kembali ke Halaman Absensi
-                    </a>
-                </div>
             </div>
         </div>
         @endif
 
-        {{-- VALIDASI IZIN/SAKIT HARI INI (hanya tampil jika sudah check-in) --}}
+        {{-- VALIDASI IZIN/SAKIT HARI INI --}}
         @if(isset($sudahCheckIn) && $sudahCheckIn && isset($isIzinHariIni) && $isIzinHariIni)
         <div class="mb-6 bg-blue-50 border-l-4 border-blue-500 rounded-lg p-5 shadow-sm">
             <div class="flex items-center gap-4">
@@ -88,7 +84,10 @@
                     </svg>
                 </div>
                 <div class="flex-1">
-                    <p class="font-semibold text-blue-800 text-lg">
+                    <p class="font-semibold text-blue-800 text-lg flex items-center gap-2">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                        </svg>
                         @if($izinStatus == 'izin')
                             Anda sedang IZIN pada hari ini
                         @else
@@ -103,7 +102,7 @@
         </div>
         @endif
 
-        {{-- PERINGATAN JIKA SUDAH INPUT KINERJA HARI INI (hanya tampil jika sudah check-in) --}}
+        {{-- PERINGATAN JIKA SUDAH INPUT KINERJA HARI INI --}}
         @if(isset($sudahCheckIn) && $sudahCheckIn && isset($sudahInputHariIni) && $sudahInputHariIni && (!isset($isIzinHariIni) || !$isIzinHariIni))
         <div class="mb-6 bg-green-50 border-l-4 border-green-500 rounded-lg p-5 shadow-sm">
             <div class="flex items-center gap-4">
@@ -113,7 +112,12 @@
                     </svg>
                 </div>
                 <div class="flex-1">
-                    <p class="font-semibold text-green-800 text-lg">Kinerja Hari Ini Sudah Diinput</p>
+                    <p class="font-semibold text-green-800 text-lg flex items-center gap-2">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                        Kinerja Hari Ini Sudah Diinput
+                    </p>
                     <p class="text-sm text-green-700 mt-1">
                         Anda sudah menginput kinerja cleaning untuk hari ini. 
                         Tidak dapat menginput ulang. Silakan lanjutkan ke checkout.
@@ -132,19 +136,25 @@
         </div>
         @endif
 
-        {{-- TAB NAVIGATION (HANYA TAMPIL JIKA SUDAH CHECK-IN, BELUM INPUT & TIDAK IZIN) --}}
+        {{-- TAB NAVIGATION --}}
         @if(isset($sudahCheckIn) && $sudahCheckIn && (!isset($isIzinHariIni) || !$isIzinHariIni) && (!isset($sudahInputHariIni) || !$sudahInputHariIni))
         <div class="flex gap-2 bg-white border border-[#E2E8F0] rounded-full p-1 w-fit mb-6 shadow-sm">
-            <button onclick="showTab('input')" id="tab-input-btn" class="tab-btn px-4 md:px-6 py-2 rounded-full text-sm font-semibold transition-all duration-200 bg-[#2c5e4e] text-white shadow-md whitespace-nowrap">
+            <button onclick="showTab('input')" id="tab-input-btn" class="tab-btn px-4 md:px-6 py-2 rounded-full text-sm font-semibold transition-all duration-200 bg-[#2c5e4e] text-white shadow-md whitespace-nowrap flex items-center gap-2">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path>
+                </svg>
                 Input Kinerja
             </button>
-            <button onclick="showTab('riwayat')" id="tab-riwayat-btn" class="tab-btn px-4 md:px-6 py-2 rounded-full text-sm font-semibold transition-all duration-200 text-gray-600 hover:bg-[#eaf4f1] hover:text-[#2c5e4e] whitespace-nowrap">
+            <button onclick="showTab('riwayat')" id="tab-riwayat-btn" class="tab-btn px-4 md:px-6 py-2 rounded-full text-sm font-semibold transition-all duration-200 text-gray-600 hover:bg-[#eaf4f1] hover:text-[#2c5e4e] whitespace-nowrap flex items-center gap-2">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path>
+                </svg>
                 Riwayat Hari Ini
             </button>
         </div>
         @endif
 
-        {{-- TAB: INPUT KINERJA (HANYA TAMPIL JIKA SUDAH CHECK-IN, BELUM INPUT & TIDAK IZIN) --}}
+        {{-- TAB: INPUT KINERJA --}}
         @if(isset($sudahCheckIn) && $sudahCheckIn && (!isset($isIzinHariIni) || !$isIzinHariIni) && (!isset($sudahInputHariIni) || !$sudahInputHariIni))
         <div id="tab-input" class="tab-content">
             <div class="bg-white rounded-xl md:rounded-2xl shadow-sm border border-[#E2E8F0] overflow-hidden">
@@ -176,7 +186,7 @@
                                         </svg>
                                         Area <span class="text-red-500">*</span>
                                     </label>
-                                    <input type="text" name="area[]" class="w-full border border-gray-200 rounded-xl px-4 py-2.5 sm:py-3 focus:border-[#2c5e4e] focus:ring-2 focus:ring-[#2c5e4e]/20 outline-none transition" placeholder="Contoh: Area Lobby, Toilet Lt.2" required>
+                                    <input type="text" name="area[]" class="area-input w-full border border-gray-200 rounded-xl px-4 py-2.5 sm:py-3 focus:border-[#2c5e4e] focus:ring-2 focus:ring-[#2c5e4e]/20 outline-none transition" placeholder="Contoh: Area Lobby, Toilet Lt.2" required>
                                 </div>
 
                                 <div class="mb-4 sm:mb-5">
@@ -186,7 +196,7 @@
                                         </svg>
                                         Keterangan <span class="text-red-500">*</span>
                                     </label>
-                                    <textarea name="keterangan[]" required class="w-full border border-gray-200 rounded-xl px-4 py-2.5 sm:py-3 focus:border-[#2c5e4e] focus:ring-2 focus:ring-[#2c5e4e]/20 outline-none transition" rows="3" placeholder="Deskripsi pekerjaan..."></textarea>
+                                    <textarea name="keterangan[]" required class="keterangan-input w-full border border-gray-200 rounded-xl px-4 py-2.5 sm:py-3 focus:border-[#2c5e4e] focus:ring-2 focus:ring-[#2c5e4e]/20 outline-none transition" rows="3" placeholder="Deskripsi pekerjaan..."></textarea>
                                 </div>
 
                                 <div>
@@ -236,7 +246,7 @@
                                 </svg>
                                 Tambah Area
                             </button>
-                            <button type="submit" class="inline-flex items-center gap-2 bg-[#2c5e4e] hover:bg-[#1f4a3d] text-white px-5 py-2 rounded-xl font-semibold shadow-md transition-all">
+                            <button type="button" id="submitBtn" class="inline-flex items-center gap-2 bg-[#2c5e4e] hover:bg-[#1f4a3d] text-white px-5 py-2 rounded-xl font-semibold shadow-md transition-all">
                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
                                 </svg>
@@ -249,7 +259,7 @@
         </div>
         @endif
 
-        {{-- TAMPILKAN RIWAYAT (HANYA TAMPIL JIKA SUDAH CHECK-IN) --}}
+        {{-- TAMPILKAN RIWAYAT --}}
         @php
             $showRiwayatOnly = (isset($sudahCheckIn) && $sudahCheckIn) && ((isset($isIzinHariIni) && $isIzinHariIni) || (isset($sudahInputHariIni) && $sudahInputHariIni));
         @endphp
@@ -308,7 +318,7 @@
         </div>
         @endif
 
-        {{-- TOMBOL KEMBALI KE ABSENSI (JIKA SUDAH INPUT ATAU IZIN ATAU BELUM CHECK-IN) --}}
+        {{-- TOMBOL KEMBALI KE ABSENSI --}}
         @if((isset($showRiwayatOnly) && $showRiwayatOnly) || (isset($sudahCheckIn) && !$sudahCheckIn))
         <div class="mt-6 text-center">
             <a href="{{ route('attendance.index') }}" class="inline-flex items-center gap-2 bg-[#2c5e4e] hover:bg-[#1f4a3d] text-white px-6 py-3 rounded-xl font-semibold transition-all shadow-md">
@@ -322,6 +332,53 @@
 
     </div>
 </div>
+
+{{-- MODAL KONFIRMASI --}}
+<div id="validationModal" class="fixed inset-0 bg-black/50 hidden items-center justify-center z-50">
+    <div class="bg-white rounded-2xl max-w-md w-full mx-4 overflow-hidden shadow-2xl">
+        <div class="bg-[#2c5e4e] px-6 py-4">
+            <h3 class="text-white font-bold text-lg flex items-center gap-2">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                </svg>
+                Konfirmasi Data Kinerja
+            </h3>
+        </div>
+        <div class="p-6">
+            <p class="text-gray-700 mb-4">Pastikan data berikut sudah benar:</p>
+            <div id="validationSummary" class="space-y-4 max-h-96 overflow-y-auto"></div>
+            <div class="mt-4 p-3 bg-amber-50 rounded-lg border border-amber-200">
+                <div class="flex items-center gap-2 text-amber-700 text-xs">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
+                    </svg>
+                    <span>Data yang sudah disimpan tidak dapat diubah pada hari yang sama</span>
+                </div>
+            </div>
+            <div class="flex gap-3 mt-6">
+                <button type="button" id="closeModalBtn" class="flex-1 px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-all">Batal</button>
+                <button type="button" id="confirmSubmitBtn" class="flex-1 px-4 py-2 bg-[#2c5e4e] text-white rounded-lg hover:bg-[#1f4a3d] transition-all flex items-center justify-center gap-2">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                    </svg>
+                    Konfirmasi & Simpan
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.tab-content {
+    transition: all 0.3s ease;
+}
+#successMessage {
+    transition: opacity 0.3s ease;
+}
+.modal-open {
+    overflow: hidden;
+}
+</style>
 
 <script>
 let videoStreams = new Map();
@@ -346,7 +403,6 @@ async function initCamera(videoElement) {
         });
     } catch (err) {
         console.error('Kamera error:', err);
-        alert('Tidak dapat mengakses kamera. Pastikan izin kamera diberikan.');
     }
 }
 
@@ -418,7 +474,7 @@ function tambahForm() {
                 </svg>
                 Area <span class="text-red-500">*</span>
             </label>
-            <input type="text" name="area[]" class="w-full border border-gray-200 rounded-xl px-4 py-2.5 sm:py-3 focus:border-[#2c5e4e] focus:ring-2 focus:ring-[#2c5e4e]/20 outline-none transition" placeholder="Contoh: Area Lobby, Toilet Lt.2" required>
+            <input type="text" name="area[]" class="area-input w-full border border-gray-200 rounded-xl px-4 py-2.5 sm:py-3 focus:border-[#2c5e4e] focus:ring-2 focus:ring-[#2c5e4e]/20 outline-none transition" placeholder="Contoh: Area Lobby, Toilet Lt.2" required>
         </div>
         <div class="mb-4 sm:mb-5">
             <label class="block text-sm font-semibold text-gray-700 mb-2">
@@ -427,7 +483,7 @@ function tambahForm() {
                 </svg>
                 Keterangan <span class="text-red-500">*</span>
             </label>
-            <textarea name="keterangan[]" required class="w-full border border-gray-200 rounded-xl px-4 py-2.5 sm:py-3 focus:border-[#2c5e4e] focus:ring-2 focus:ring-[#2c5e4e]/20 outline-none transition" rows="3" placeholder="Deskripsi pekerjaan..."></textarea>
+            <textarea name="keterangan[]" required class="keterangan-input w-full border border-gray-200 rounded-xl px-4 py-2.5 sm:py-3 focus:border-[#2c5e4e] focus:ring-2 focus:ring-[#2c5e4e]/20 outline-none transition" rows="3" placeholder="Deskripsi pekerjaan..."></textarea>
         </div>
         <div>
             <label class="block text-sm font-semibold text-gray-700 mb-2">
@@ -528,26 +584,106 @@ function showTab(tab) {
     }
 }
 
-document.getElementById('kinerjaForm')?.addEventListener('submit', function(e) {
+function showValidationModal() {
     const items = document.querySelectorAll('.item');
-    let isValid = true;
-    let errors = [];
+    let allValid = true;
+    const validationSummary = [];
+    
     items.forEach((item, index) => {
-        const area = item.querySelector('input[name="area[]"]')?.value.trim();
-        const keterangan = item.querySelector('textarea[name="keterangan[]"]')?.value.trim();
+        const area = item.querySelector('.area-input')?.value.trim();
+        const keterangan = item.querySelector('.keterangan-input')?.value.trim();
         const foto = item.querySelector('.foto-input')?.value;
-        if (!area) { isValid = false; errors.push(`Area #${index+1}`); }
-        if (!keterangan) { isValid = false; errors.push(`Keterangan #${index+1}`); }
-        if (!foto) { isValid = false; errors.push(`Foto #${index+1}`); }
+        
+        if (!area) allValid = false;
+        if (!keterangan) allValid = false;
+        if (!foto) allValid = false;
+        
+        validationSummary.push({
+            area: index + 1,
+            nama_area: area || '(belum diisi)',
+            keterangan: keterangan || '(belum diisi)',
+            hasFoto: !!foto
+        });
     });
-    if (!isValid) {
-        e.preventDefault();
-        alert(`Data belum lengkap!\nLengkapi: ${errors.join(', ')}`);
+    
+    if (!allValid) {
+        alert('Mohon lengkapi semua data yang wajib diisi!\n\nPastikan Area, Keterangan, dan Foto sudah diisi untuk semua area.');
+        return false;
     }
-});
+    
+    const summaryDiv = document.getElementById('validationSummary');
+    if (summaryDiv) {
+        summaryDiv.innerHTML = '';
+        
+        validationSummary.forEach(item => {
+            const areaDiv = document.createElement('div');
+            areaDiv.className = 'border-b border-gray-200 pb-3 mb-3 last:border-0';
+            areaDiv.innerHTML = `
+                <div class="font-semibold text-[#2c5e4e] mb-2 flex items-center gap-2">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                    </svg>
+                    Area ${item.area}: ${item.nama_area}
+                </div>
+                <div class="text-sm text-gray-600 ml-6">
+                    <div class="flex items-start gap-2">
+                        <svg class="w-4 h-4 mt-0.5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+                        </svg>
+                        <span>${item.keterangan.length > 80 ? item.keterangan.substring(0, 80) + '...' : item.keterangan}</span>
+                    </div>
+                    <div class="flex items-center gap-2 mt-1">
+                        <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"></path>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                        </svg>
+                        <span>${item.hasFoto ? 'Foto sudah diambil' : 'Belum ada foto'}</span>
+                    </div>
+                </div>
+            `;
+            summaryDiv.appendChild(areaDiv);
+        });
+    }
+    
+    const modal = document.getElementById('validationModal');
+    if (modal) {
+        modal.classList.remove('hidden');
+        modal.classList.add('flex');
+        document.body.classList.add('modal-open');
+    }
+    return true;
+}
+
+function closeModal() {
+    const modal = document.getElementById('validationModal');
+    if (modal) {
+        modal.classList.add('hidden');
+        modal.classList.remove('flex');
+        document.body.classList.remove('modal-open');
+    }
+}
+
+function submitForm() {
+    closeModal();
+    const form = document.getElementById('kinerjaForm');
+    if (form) {
+        const confirmBtn = document.getElementById('confirmSubmitBtn');
+        if (confirmBtn) {
+            confirmBtn.disabled = true;
+            confirmBtn.innerHTML = `
+                <svg class="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24">
+                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+                Menyimpan...
+            `;
+        }
+        form.submit();
+    }
+}
 
 document.addEventListener('DOMContentLoaded', function() {
-    // Hanya inisialisasi kamera jika form input tersedia dan user sudah check-in
     @if(isset($sudahCheckIn) && $sudahCheckIn && (!isset($isIzinHariIni) || !$isIzinHariIni) && (!isset($sudahInputHariIni) || !$sudahInputHariIni))
         document.querySelectorAll('.camera-video').forEach(video => initCamera(video));
         document.querySelectorAll('.take-photo-btn').forEach(btn => {
@@ -564,6 +700,45 @@ document.addEventListener('DOMContentLoaded', function() {
         
         showTab('input');
     @endif
+    
+    // Submit button handler
+    const submitBtn = document.getElementById('submitBtn');
+    if (submitBtn) {
+        submitBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            showValidationModal();
+        });
+    }
+    
+    // Modal handlers
+    const closeModalBtn = document.getElementById('closeModalBtn');
+    const confirmSubmitBtn = document.getElementById('confirmSubmitBtn');
+    const modal = document.getElementById('validationModal');
+    
+    if (closeModalBtn) {
+        closeModalBtn.addEventListener('click', closeModal);
+    }
+    
+    if (confirmSubmitBtn) {
+        confirmSubmitBtn.addEventListener('click', submitForm);
+    }
+    
+    if (modal) {
+        modal.addEventListener('click', function(e) {
+            if (e.target === modal) {
+                closeModal();
+            }
+        });
+    }
+    
+    // Auto hide success message
+    const successMessage = document.getElementById('successMessage');
+    if (successMessage) {
+        setTimeout(() => {
+            successMessage.style.opacity = '0';
+            setTimeout(() => successMessage.remove(), 300);
+        }, 5000);
+    }
 });
 </script>
 @endsection

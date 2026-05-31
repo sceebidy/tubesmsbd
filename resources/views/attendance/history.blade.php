@@ -17,7 +17,7 @@
                     </div>
                     <div>
                         <h1 class="text-2xl sm:text-3xl font-bold text-[#2c5e4e]">Riwayat Absensi</h1>
-                        <p class="text-sm text-gray-500 mt-1">Rekap kehadiran {{ Auth::user()->name }}</p>
+                        <p class="text-xs text-gray-500 mt-0.5">Rekap kehadiran {{ Auth::user()->name }}</p>
                     </div>
                 </div>
                 <div class="flex items-center gap-4">
@@ -337,7 +337,7 @@
                             <tr>
                                 <td colspan="7" class="px-5 py-10 text-center">
                                     <div class="text-center py-8">
-                                        <div class="text-6xl mb-3">📝</div>
+                                        
                                         <h3 class="text-xl font-semibold text-gray-700 mb-2">Belum Ada Data Absensi</h3>
                                         <p class="text-gray-500 mb-4">Silakan lakukan absensi terlebih dahulu untuk melihat riwayat</p>
                                         <a href="{{ route('attendance.index') }}" class="inline-flex items-center gap-2 bg-[#2c5e4e] hover:bg-[#1f4a3d] text-white px-6 py-3 rounded-xl font-semibold transition-all shadow-md">

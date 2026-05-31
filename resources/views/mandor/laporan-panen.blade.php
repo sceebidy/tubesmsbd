@@ -57,7 +57,6 @@
         {{-- CEK STATUS CHECK-IN --}}
         {{-- ============================================================ --}}
         @if(isset($isIzinHariIni) && $isIzinHariIni)
-            {{-- IZIN/SAKIT --}}
             <div class="mb-6 bg-blue-50 border-l-4 border-blue-500 rounded-lg p-5 shadow-sm">
                 <div class="flex items-center gap-4">
                     <div class="flex-shrink-0">
@@ -80,7 +79,6 @@
                 </div>
             </div>
         @elseif(isset($sudahCheckIn) && !$sudahCheckIn)
-            {{-- BELUM CHECK-IN --}}
             <div class="mb-6 bg-red-50 border-l-4 border-red-500 rounded-lg p-5 shadow-sm">
                 <div class="flex items-center gap-4">
                     <div class="flex-shrink-0">
@@ -89,7 +87,7 @@
                         </svg>
                     </div>
                     <div class="flex-1">
-                        <p class="font-semibold text-red-800 text-lg">⚠️ AKSES DIBATASI ⚠️</p>
+                        <p class="font-semibold text-red-800 text-lg"> AKSES DIBATASI </p>
                         <p class="text-sm text-red-700 mt-1">
                             <strong>Anda harus CHECK-IN terlebih dahulu</strong> sebelum dapat mengakses halaman verifikasi panen.
                         </p>
@@ -108,7 +106,6 @@
                 </div>
             </div>
         @elseif(isset($sudahVerifikasiHariIni) && $sudahVerifikasiHariIni)
-            {{-- SUDAH VERIFIKASI HARI INI --}}
             <div class="mb-6 bg-green-50 border-l-4 border-green-500 rounded-lg p-5 shadow-sm">
                 <div class="flex items-center gap-4">
                     <div class="flex-shrink-0">
@@ -132,44 +129,77 @@
         {{-- ============================================================ --}}
         @if((isset($sudahCheckIn) && $sudahCheckIn) && (!isset($isIzinHariIni) || !$isIzinHariIni))
 
-        {{-- CUSTOM MODAL KONFIRMASI VERIFIKASI --}}
-        <div id="verifikasiModal" class="hidden fixed inset-0 bg-black bg-opacity-40 z-50 flex items-center justify-center transition-all duration-300">
-            <div class="bg-white rounded-xl shadow-xl w-full max-w-sm mx-4 overflow-hidden transform transition-all duration-300 scale-95">
-                <div class="bg-[#2c5e4e] px-5 py-4">
+        {{-- MODAL KONFIRMASI VERIFIKASI --}}
+        <div id="verifikasiModal" class="fixed inset-0 bg-black/50 hidden items-center justify-center z-50">
+            <div class="bg-white rounded-2xl max-w-md w-full mx-4 overflow-hidden shadow-2xl transform transition-all duration-300 scale-95">
+                <div class="bg-[#2c5e4e] px-6 py-4">
                     <div class="flex items-center gap-3">
-                        <div class="w-8 h-8 bg-white/20 rounded-full flex items-center justify-center">
-                            <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
+                        <div class="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center">
+                            <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                             </svg>
                         </div>
-                        <h3 class="text-base font-semibold text-white">Konfirmasi Verifikasi</h3>
+                        <div>
+                            <h3 class="text-lg font-bold text-white">Konfirmasi Verifikasi</h3>
+                            <p class="text-xs text-white/70">Pastikan data sudah benar sebelum diverifikasi</p>
+                        </div>
                     </div>
                 </div>
-                <div class="p-5">
-                    <p class="text-gray-700 text-sm mb-3 text-center">⚠️ <strong>Peringatan!</strong></p>
-                    <p class="text-gray-600 text-sm text-center">Data yang sudah diverifikasi <strong class="text-red-600">tidak dapat diubah kembali</strong>.</p>
-                    <p class="text-gray-500 text-xs text-center mt-2 mb-4">Pastikan semua data panen sudah benar.</p>
+                
+                <div class="p-6">
+                    <div class="bg-amber-50 rounded-xl p-4 mb-5 border border-amber-200">
+                        <div class="flex items-start gap-3">
+                            <svg class="w-5 h-5 text-amber-600 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
+                            </svg>
+                            <div>
+                                <p class="font-semibold text-amber-800 text-sm">Perhatian!</p>
+                                <p class="text-sm text-amber-700">Data yang sudah diverifikasi <strong>tidak dapat diubah kembali</strong>.</p>
+                            </div>
+                        </div>
+                    </div>
                     
-                    <div class="bg-gray-50 rounded-lg p-3 mb-5">
-                        <div class="flex justify-between text-sm mb-1">
-                            <span class="text-gray-500">Total Janjang:</span>
-                            <span class="font-semibold text-gray-700" id="modalTotalJanjang">-</span>
+                    <div class="bg-gray-50 rounded-xl p-5 space-y-3 mb-5">
+                        <div class="flex justify-between items-center pb-2 border-b border-gray-200">
+                            <div class="flex items-center gap-2">
+                                <svg class="w-4 h-4 text-[#2c5e4e]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path>
+                                </svg>
+                                <span class="text-sm font-medium text-gray-600">Total Janjang</span>
+                            </div>
+                            <span class="text-base font-bold text-gray-800" id="modalTotalJanjang">-</span>
                         </div>
-                        <div class="flex justify-between text-sm mb-1">
-                            <span class="text-gray-500">Total Brondolan:</span>
-                            <span class="font-semibold text-gray-700" id="modalTotalBrondolan">-</span>
+                        <div class="flex justify-between items-center pb-2 border-b border-gray-200">
+                            <div class="flex items-center gap-2">
+                                <svg class="w-4 h-4 text-[#2c5e4e]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path>
+                                </svg>
+                                <span class="text-sm font-medium text-gray-600">Total Brondolan</span>
+                            </div>
+                            <span class="text-base font-bold text-gray-800" id="modalTotalBrondolan">-</span>
                         </div>
-                        <div class="flex justify-between text-sm">
-                            <span class="text-gray-500">Berat Timbangan:</span>
-                            <span class="font-semibold text-[#2c5e4e]" id="modalBeratTimbangan">-</span>
+                        <div class="flex justify-between items-center">
+                            <div class="flex items-center gap-2">
+                                <svg class="w-4 h-4 text-[#2c5e4e]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 6l3 1m0 0l-3 9a5.002 5.002 0 006.001 0M6 7l3 9M6 7l6-2m6 2l3-1m-3 1l-3 9a5.002 5.002 0 006.001 0M18 7l3 9m-3-9l-6-2"></path>
+                                </svg>
+                                <span class="text-sm font-medium text-gray-600">Berat Timbangan</span>
+                            </div>
+                            <span class="text-base font-bold text-[#2c5e4e]" id="modalBeratTimbangan">-</span>
                         </div>
                     </div>
                     
                     <div class="flex gap-3">
-                        <button onclick="confirmVerifikasiSubmit()" class="flex-1 bg-[#2c5e4e] hover:bg-[#1f4a3d] text-white font-semibold py-2 rounded-lg transition-all text-sm">
+                        <button onclick="confirmVerifikasiSubmit()" class="flex-1 bg-[#2c5e4e] hover:bg-[#1f4a3d] text-white font-semibold py-2.5 rounded-xl transition-all flex items-center justify-center gap-2">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                            </svg>
                             Ya, Verifikasi
                         </button>
-                        <button onclick="closeVerifikasiModal()" class="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-700 font-semibold py-2 rounded-lg transition-all text-sm">
+                        <button onclick="closeVerifikasiModal()" class="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-700 font-semibold py-2.5 rounded-xl transition-all flex items-center justify-center gap-2">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                            </svg>
                             Batal
                         </button>
                     </div>
@@ -179,10 +209,16 @@
 
         {{-- TAB NAVIGATION --}}
         <div class="flex gap-2 bg-white border border-[#E2E8F0] rounded-full p-1 w-fit mb-6 shadow-sm">
-            <button onclick="showTab('input')" id="tab-input-btn" class="tab-btn px-4 md:px-6 py-2 rounded-full text-sm font-semibold transition-all duration-200 bg-[#2c5e4e] text-white shadow-md whitespace-nowrap">
+            <button onclick="showTab('input')" id="tab-input-btn" class="tab-btn px-4 md:px-6 py-2 rounded-full text-sm font-semibold transition-all duration-200 bg-[#2c5e4e] text-white shadow-md whitespace-nowrap flex items-center gap-2">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path>
+                </svg>
                 Verifikasi Panen
             </button>
-            <button onclick="showTab('riwayat')" id="tab-riwayat-btn" class="tab-btn px-4 md:px-6 py-2 rounded-full text-sm font-semibold transition-all duration-200 text-gray-600 hover:bg-[#eaf4f1] hover:text-[#2c5e4e] whitespace-nowrap">
+            <button onclick="showTab('riwayat')" id="tab-riwayat-btn" class="tab-btn px-4 md:px-6 py-2 rounded-full text-sm font-semibold transition-all duration-200 text-gray-600 hover:bg-[#eaf4f1] hover:text-[#2c5e4e] whitespace-nowrap flex items-center gap-2">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path>
+                </svg>
                 Riwayat Verifikasi
             </button>
         </div>
@@ -315,7 +351,7 @@
                                     </div>
                                     <div>
                                         <label class="block text-xs font-semibold uppercase tracking-wide text-gray-500 mb-1.5">
-                                            Total Berat Timbangan <span class="text-red-500">*</span>
+                                            Total Berat Timbangan (kg) <span class="text-red-500">*</span>
                                         </label>
                                         <div class="relative">
                                             <input type="number" 
@@ -549,6 +585,12 @@
 .tab-content {
     transition: all 0.3s ease;
 }
+.modal-open {
+    overflow: hidden;
+}
+#verifikasiModal {
+    transition: all 0.3s ease;
+}
 </style>
 
 <script>
@@ -566,15 +608,23 @@ function showTab(tab) {
     const riwayatBtn = document.getElementById('tab-riwayat-btn');
 
     if (tab === 'input') {
-        inputBtn.classList.add('bg-[#2c5e4e]', 'text-white', 'shadow-md');
-        inputBtn.classList.remove('text-gray-600', 'bg-transparent', 'hover:bg-[#eaf4f1]');
-        riwayatBtn.classList.remove('bg-[#2c5e4e]', 'text-white', 'shadow-md');
-        riwayatBtn.classList.add('text-gray-600', 'bg-transparent', 'hover:bg-[#eaf4f1]');
+        if (inputBtn) {
+            inputBtn.classList.add('bg-[#2c5e4e]', 'text-white', 'shadow-md');
+            inputBtn.classList.remove('text-gray-600', 'bg-transparent');
+        }
+        if (riwayatBtn) {
+            riwayatBtn.classList.remove('bg-[#2c5e4e]', 'text-white', 'shadow-md');
+            riwayatBtn.classList.add('text-gray-600', 'bg-transparent');
+        }
     } else {
-        riwayatBtn.classList.add('bg-[#2c5e4e]', 'text-white', 'shadow-md');
-        riwayatBtn.classList.remove('text-gray-600', 'bg-transparent', 'hover:bg-[#eaf4f1]');
-        inputBtn.classList.remove('bg-[#2c5e4e]', 'text-white', 'shadow-md');
-        inputBtn.classList.add('text-gray-600', 'bg-transparent', 'hover:bg-[#eaf4f1]');
+        if (riwayatBtn) {
+            riwayatBtn.classList.add('bg-[#2c5e4e]', 'text-white', 'shadow-md');
+            riwayatBtn.classList.remove('text-gray-600', 'bg-transparent');
+        }
+        if (inputBtn) {
+            inputBtn.classList.remove('bg-[#2c5e4e]', 'text-white', 'shadow-md');
+            inputBtn.classList.add('text-gray-600', 'bg-transparent');
+        }
     }
 }
 
@@ -582,39 +632,52 @@ function showTab(tab) {
 function showVerifikasiModal(tanggal, totalJanjang, totalBrondolan) {
     const beratInput = document.getElementById(`berat-${tanggal}`);
     
-    if (!beratInput.value || beratInput.value <= 0) {
-        alert('Harap masukkan total berat timbangan terlebih dahulu!');
+    if (!beratInput.value || parseFloat(beratInput.value) <= 0) {
+        alert('⚠️ Harap masukkan total berat timbangan terlebih dahulu!');
         beratInput.focus();
-        return;
+        return false;
     }
     
     currentFormToSubmit = document.getElementById(`form-${tanggal}`);
     currentTotalJanjang = totalJanjang;
     currentTotalBrondolan = totalBrondolan;
-    currentBeratTimbangan = beratInput.value;
+    currentBeratTimbangan = parseFloat(beratInput.value).toLocaleString('id-ID', {minimumFractionDigits: 2, maximumFractionDigits: 2});
     
-    document.getElementById('modalTotalJanjang').textContent = totalJanjang.toLocaleString();
-    document.getElementById('modalTotalBrondolan').textContent = totalBrondolan.toLocaleString();
-    document.getElementById('modalBeratTimbangan').textContent = beratInput.value;
+    document.getElementById('modalTotalJanjang').innerHTML = totalJanjang.toLocaleString('id-ID') + ' <span class="text-xs font-normal text-gray-400">janjang</span>';
+    document.getElementById('modalTotalBrondolan').innerHTML = totalBrondolan.toLocaleString('id-ID', {minimumFractionDigits: 2, maximumFractionDigits: 2}) + ' <span class="text-xs font-normal text-gray-400">Kg</span>';
+    document.getElementById('modalBeratTimbangan').innerHTML = currentBeratTimbangan + ' <span class="text-xs font-normal text-gray-400">Kg</span>';
     
     const modal = document.getElementById('verifikasiModal');
-    modal.classList.remove('hidden');
-    setTimeout(() => {
-        modal.querySelector('.bg-white').classList.remove('scale-95');
-        modal.querySelector('.bg-white').classList.add('scale-100');
-    }, 10);
-    document.body.style.overflow = 'hidden';
+    if (modal) {
+        modal.classList.remove('hidden');
+        modal.classList.add('flex');
+        document.body.classList.add('modal-open');
+        setTimeout(() => {
+            const modalContent = modal.querySelector('.bg-white');
+            if (modalContent) {
+                modalContent.classList.remove('scale-95');
+                modalContent.classList.add('scale-100');
+            }
+        }, 10);
+    }
+    return true;
 }
 
 // Fungsi untuk menutup modal
 function closeVerifikasiModal() {
     const modal = document.getElementById('verifikasiModal');
-    modal.querySelector('.bg-white').classList.remove('scale-100');
-    modal.querySelector('.bg-white').classList.add('scale-95');
-    setTimeout(() => {
-        modal.classList.add('hidden');
-        document.body.style.overflow = '';
-    }, 200);
+    if (modal) {
+        const modalContent = modal.querySelector('.bg-white');
+        if (modalContent) {
+            modalContent.classList.remove('scale-100');
+            modalContent.classList.add('scale-95');
+        }
+        setTimeout(() => {
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+            document.body.classList.remove('modal-open');
+        }, 200);
+    }
     currentFormToSubmit = null;
 }
 
@@ -627,15 +690,27 @@ function confirmVerifikasiSubmit() {
 }
 
 // Tutup modal jika klik di luar
-document.getElementById('verifikasiModal').addEventListener('click', function(e) {
-    if (e.target === this) {
-        closeVerifikasiModal();
-    }
-});
-
-// Set default tab
 document.addEventListener('DOMContentLoaded', function() {
+    const modal = document.getElementById('verifikasiModal');
+    if (modal) {
+        modal.addEventListener('click', function(e) {
+            if (e.target === modal) {
+                closeVerifikasiModal();
+            }
+        });
+    }
+    
+    // Set default tab
     showTab('input');
+    
+    // Auto hide success message after 5 seconds
+    const successMessage = document.querySelector('.bg-[#e8f5f0]');
+    if (successMessage) {
+        setTimeout(() => {
+            successMessage.style.opacity = '0';
+            setTimeout(() => successMessage.remove(), 5000);
+        }, 5000);
+    }
 });
 </script>
 @endsection

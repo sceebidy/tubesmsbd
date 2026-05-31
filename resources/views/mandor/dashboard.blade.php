@@ -120,7 +120,7 @@
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
                 </svg>
                 <div>
-                    <p class="font-semibold">⚠️ Perhatian!</p>
+                    <p class="font-semibold">Perhatian!</p>
                     <p class="text-sm mt-1">Anda memiliki <strong>{{ count($belumDiverifikasi) }}</strong> laporan panen yang belum diverifikasi. 
                     Silakan verifikasi laporan panen sebelum checkout.</p>
                     <a href="{{ route('mandor.panen') }}" class="inline-block mt-3 text-sm font-semibold text-amber-800 hover:text-amber-900 underline">
@@ -404,6 +404,209 @@
 
         </div>
 
+    {{-- TABEL DETAIL ANGGOTA --}}
+<div class="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden mt-6">
+    <div class="px-7 py-5 border-b border-[#eaf4f1] flex items-center justify-between">
+        <div class="flex items-center gap-3">
+            <svg class="w-6 h-6 text-[#2c5e4e]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/>
+            </svg>
+            <h2 class="text-lg font-semibold text-gray-700">Daftar Anggota & Status Kehadiran</h2>
+        </div>
+        
     </div>
+    <div class="overflow-x-auto">
+        <table class="w-full">
+            <thead class="bg-gray-50 border-b border-gray-200">
+                <tr>
+                    <th class="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase">
+                        <div class="flex items-center gap-1">
+                            <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/>
+                            </svg>
+                            Nama Pekerja
+                        </div>
+                    </th>
+                    <th class="px-4 py-3 text-center text-xs font-semibold text-gray-500 uppercase">
+                        <div class="flex items-center justify-center gap-1">
+                            <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                            </svg>
+                            Status
+                        </div>
+                    </th>
+                    <th class="px-4 py-3 text-center text-xs font-semibold text-gray-500 uppercase">
+                        <div class="flex items-center justify-center gap-1">
+                            <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1"></path>
+                            </svg>
+                            Check In
+                        </div>
+                    </th>
+                    <th class="px-4 py-3 text-center text-xs font-semibold text-gray-500 uppercase">
+                        <div class="flex items-center justify-center gap-1">
+                            <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path>
+                            </svg>
+                            Check Out
+                        </div>
+                    </th>
+                </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-100">
+                @forelse($detailAnggota as $anggota)
+                <tr class="hover:bg-gray-50 transition">
+                    <td class="px-4 py-3">
+                        <div class="flex items-center gap-3">
+                            <div class="w-8 h-8 rounded-full bg-[#eaf4f1] flex items-center justify-center">
+                                <span class="text-sm font-bold text-[#2c5e4e]">{{ strtoupper(substr($anggota['name'], 0, 1)) }}</span>
+                            </div>
+                            <div>
+                                <p class="text-sm font-medium text-gray-800">{{ $anggota['name'] }}</p>
+                                <p class="text-xs text-gray-400 flex items-center gap-1">
+                                    <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path>
+                                    </svg>
+                                    Pekerja Sawit
+                                </p>
+                            </div>
+                        </div>
+                    </td>
+                    <td class="px-4 py-3 text-center">
+                        @php
+                            $badgeClass = match($anggota['status_color']) {
+                                'green' => 'bg-green-100 text-green-700',
+                                'orange' => 'bg-orange-100 text-orange-700',
+                                'blue' => 'bg-blue-100 text-blue-700',
+                                'purple' => 'bg-purple-100 text-purple-700',
+                                'red' => 'bg-red-100 text-red-700',
+                                default => 'bg-gray-100 text-gray-600'
+                            };
+                        @endphp
+                        <span class="inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-semibold {{ $badgeClass }}">
+                            @if($anggota['status_kehadiran'] == 'tepat_waktu')
+                                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                                </svg>
+                                Hadir
+                            @elseif($anggota['status_kehadiran'] == 'terlambat')
+                                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                </svg>
+                                Terlambat
+                            @elseif($anggota['status_kehadiran'] == 'izin')
+                                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                                </svg>
+                                Izin
+                            @elseif($anggota['status_kehadiran'] == 'sakit')
+                                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                </svg>
+                                Sakit
+                            @elseif($anggota['status_kehadiran'] == 'alpa')
+                                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                </svg>
+                                Alpa
+                            @else
+                                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                </svg>
+                                Belum Absen
+                            @endif
+                        </span>
+                    </td>
+                    <td class="px-4 py-3 text-center">
+                        @if($anggota['check_in_time'])
+                            <div class="flex flex-col items-center">
+                                <span class="text-sm font-medium text-gray-800">{{ $anggota['check_in_time'] }}</span>
+                                <span class="text-xs text-gray-400 flex items-center gap-1">
+                                    <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                    </svg>
+                                    WIB
+                                </span>
+                            </div>
+                        @else
+                            <span class="text-sm text-gray-400">--:--:--</span>
+                        @endif
+                    </td>
+                    <td class="px-4 py-3 text-center">
+                        @if($anggota['check_out_time'])
+                            <div class="flex flex-col items-center">
+                                <span class="text-sm font-medium text-gray-800">{{ $anggota['check_out_time'] }}</span>
+                                <span class="text-xs text-gray-400 flex items-center gap-1">
+                                    <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                    </svg>
+                                    WIB
+                                </span>
+                            </div>
+                        @else
+                            <span class="text-sm text-gray-400">--:--:--</span>
+                        @endif
+                    </td>
+                </tr>
+                @empty
+                <tr>
+                    <td colspan="4" class="px-4 py-8 text-center">
+                        <div class="flex flex-col items-center">
+                            <svg class="w-16 h-16 text-gray-300 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path>
+                            </svg>
+                            <p class="text-gray-500 font-medium">Belum ada anggota yang ditugaskan</p>
+                            <p class="text-xs text-gray-400 mt-1">Silakan hubungi admin untuk menambahkan pekerja</p>
+                        </div>
+                    </td>
+                </tr>
+                @endforelse
+            </tbody>
+        </table>
+    </div>
+    <div class="px-7 py-3 bg-gray-50 border-t border-gray-200 flex justify-between items-center">
+        <div class="flex items-center gap-2">
+            <svg class="w-4 h-4 text-[#2c5e4e]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/>
+            </svg>
+            <p class="text-xs text-gray-500">Total Anggota: <span class="font-semibold text-gray-700">{{ $totalPekerja }}</span></p>
+        </div>
+        <div class="flex gap-3">
+            <div class="flex items-center gap-1.5">
+                <svg class="w-3 h-3 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                </svg>
+                <span class="text-xs text-gray-600">Hadir: <span class="font-semibold">{{ $pekerjaTepatWaktu }}</span></span>
+            </div>
+            <div class="flex items-center gap-1.5">
+                <svg class="w-3 h-3 text-orange-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                </svg>
+                <span class="text-xs text-gray-600">Terlambat: <span class="font-semibold">{{ $pekerjaTerlambat }}</span></span>
+            </div>
+            <div class="flex items-center gap-1.5">
+                <svg class="w-3 h-3 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                </svg>
+                <span class="text-xs text-gray-600">Izin: <span class="font-semibold">{{ $pekerjaIzin }}</span></span>
+            </div>
+            <div class="flex items-center gap-1.5">
+                <svg class="w-3 h-3 text-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                </svg>
+                <span class="text-xs text-gray-600">Sakit: <span class="font-semibold">{{ $pekerjaSakit }}</span></span>
+            </div>
+            <div class="flex items-center gap-1.5">
+                <svg class="w-3 h-3 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                </svg>
+                <span class="text-xs text-gray-600">Alpa: <span class="font-semibold">{{ $pekerjaAlpa }}</span></span>
+            </div>
+        </div>
+    </div>
+</div>
+</div>
+
+    
 </div>
 @endsection

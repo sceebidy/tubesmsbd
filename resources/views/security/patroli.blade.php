@@ -7,17 +7,17 @@
         {{-- HEADER --}}
         <div class="mb-6 md:mb-8 pb-4 md:pb-5 border-b border-[#E2E8F0]">
             <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
-                <div class="flex items-center gap-3 md:gap-4">
-                    <div class="w-10 h-10 md:w-14 md:h-14 bg-[#eaf4f1] rounded-xl md:rounded-2xl flex items-center justify-center flex-shrink-0">
-                        <svg class="w-5 h-5 md:w-8 md:h-8 text-[#2c5e4e]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path>
-                        </svg>
-                    </div>
-                    <div>
-                        <p class="text-xs text-gray-500 uppercase tracking-wide mb-0.5">Security</p>
-                        <h1 class="text-xl md:text-3xl font-bold text-[#2c5e4e]">Sistem Patroli</h1>
-                    </div>
-                </div>
+             <div class="flex items-center gap-3 md:gap-4">
+    <div class="w-10 h-10 md:w-14 md:h-14 bg-[#eaf4f1] rounded-xl md:rounded-2xl flex items-center justify-center flex-shrink-0">
+        <svg class="w-5 h-5 md:w-8 md:h-8 text-[#2c5e4e]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
+        </svg>
+    </div>
+    <div>
+        <h1 class="text-xl md:text-3xl font-bold text-[#2c5e4e]">Patroli</h1>
+    </div>
+</div>
                 <div class="flex items-center gap-4">
                     <div class="text-right">
                         <p class="text-xs md:text-sm text-gray-500">{{ \Carbon\Carbon::now()->translatedFormat('l, j F Y') }}</p>
@@ -65,15 +65,7 @@
                         Silakan lakukan check-in melalui halaman absensi.
                     </p>
                 </div>
-                <div>
-                    <a href="{{ route('attendance.index') }}" 
-                       class="inline-flex items-center gap-2 bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg text-sm font-semibold transition-all">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1"></path>
-                        </svg>
-                        Kembali ke Halaman Absensi
-                    </a>
-                </div>
+            
             </div>
         </div>
         @endif

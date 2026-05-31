@@ -379,11 +379,12 @@ public function mandorDashboard()
     $today = now('Asia/Jakarta')->toDateString();
     $userId = Auth::id();
 
+    // Ambil absensi mandor hari ini
     $absenHariIni = Attendance::where('user_id', $userId)
         ->whereDate('date', $today)
         ->first();
 
-    // CEK IZIN/SAKIT HARI INI
+    // CEK IZIN/SAKIT MANDOR HARI INI
     $isIzinHariIni = Pengajuan::where('user_id', $userId)
         ->where('status', 'disetujui')
         ->whereDate('tanggal_mulai', '<=', $today)
@@ -401,8 +402,7 @@ public function mandorDashboard()
     }
 
     // ============================================================
-    // HITUNG KEHADIRAN BULAN INI (HANYA HADIR + TERLAMBAT)
-    // TIDAK TERMASUK IZIN/SAKIT
+    // HITUNG KEHADIRAN MANDOR BULAN INI
     // ============================================================
     $monthlyCount = Attendance::where('user_id', $userId)
         ->whereMonth('date', now('Asia/Jakarta')->month)
@@ -410,6 +410,9 @@ public function mandorDashboard()
         ->whereIn('status', ['hadir', 'tepat waktu', 'terlambat'])
         ->count();
 
+    // ============================================================
+    // AMBIL SEMUA PEKERJA DI BAWAH MANDOR INI
+    // ============================================================
     $pekerjaList = User::where('mandor_id', $userId)
         ->where('role', 'user')
         ->orderBy('name')
@@ -419,27 +422,106 @@ public function mandorDashboard()
     $pekerjaHadir = 0;
     $pekerjaTepatWaktu = 0;
     $pekerjaTerlambat = 0;
+    $pekerjaIzin = 0;
+    $pekerjaSakit = 0;
+    $pekerjaAlpa = 0;
+    
+    // ============================================================
+    // DETAIL ANGGOTA (HANYA NAMA, STATUS, CHECK IN, CHECK OUT)
+    // ============================================================
+    $detailAnggota = [];
     
     foreach ($pekerjaList as $pekerja) {
+        // Cek absensi pekerja hari ini
         $absenPekerja = Attendance::where('user_id', $pekerja->id)
             ->whereDate('date', $today)
             ->first();
         
-        if ($absenPekerja && $absenPekerja->check_in) {
-            $pekerjaHadir++;
-            if ($absenPekerja->status == 'tepat waktu') {
-                $pekerjaTepatWaktu++;
+        // Cek izin/sakit pekerja
+        $isPekerjaIzin = Pengajuan::where('user_id', $pekerja->id)
+            ->where('status', 'disetujui')
+            ->whereDate('tanggal_mulai', '<=', $today)
+            ->whereDate('tanggal_selesai', '>=', $today)
+            ->exists();
+        
+        $pekerjaIzinJenis = null;
+        if ($isPekerjaIzin) {
+            $pengajuanPekerja = Pengajuan::where('user_id', $pekerja->id)
+                ->where('status', 'disetujui')
+                ->whereDate('tanggal_mulai', '<=', $today)
+                ->whereDate('tanggal_selesai', '>=', $today)
+                ->first();
+            $pekerjaIzinJenis = $pengajuanPekerja->jenis;
+        }
+        
+        // Tentukan status kehadiran pekerja
+        $statusKehadiran = 'belum_absen';
+        $statusLabel = 'Belum Absen';
+        $statusColor = 'gray';
+        $checkInTime = null;
+        $checkOutTime = null;
+        
+        if ($isPekerjaIzin) {
+            if ($pekerjaIzinJenis == 'izin') {
+                $statusKehadiran = 'izin';
+                $statusLabel = 'Izin';
+                $statusColor = 'blue';
+                $pekerjaIzin++;
             } else {
+                $statusKehadiran = 'sakit';
+                $statusLabel = 'Sakit';
+                $statusColor = 'purple';
+                $pekerjaSakit++;
+            }
+        } elseif ($absenPekerja && $absenPekerja->check_in) {
+            $checkInTime = $absenPekerja->check_in;
+            $checkOutTime = $absenPekerja->check_out;
+            $status = strtolower($absenPekerja->status);
+            
+            if ($status == 'tepat waktu' || $status == 'hadir') {
+                $statusKehadiran = 'tepat_waktu';
+                $statusLabel = 'Hadir';
+                $statusColor = 'green';
+                $pekerjaHadir++;
+                $pekerjaTepatWaktu++;
+            } elseif ($status == 'terlambat') {
+                $statusKehadiran = 'terlambat';
+                $statusLabel = 'Terlambat';
+                $statusColor = 'orange';
+                $pekerjaHadir++;
                 $pekerjaTerlambat++;
             }
+        } else {
+            $statusKehadiran = 'alpa';
+            $statusLabel = 'Alpa';
+            $statusColor = 'red';
+            $pekerjaAlpa++;
         }
+        
+        // Simpan detail anggota (tanpa data panen)
+        $detailAnggota[] = [
+            'id' => $pekerja->id,
+            'name' => $pekerja->name,
+            'status_kehadiran' => $statusKehadiran,
+            'status_label' => $statusLabel,
+            'status_color' => $statusColor,
+            'check_in_time' => $checkInTime ? Carbon::parse($checkInTime)->format('H:i:s') : null,
+            'check_out_time' => $checkOutTime ? Carbon::parse($checkOutTime)->format('H:i:s') : null,
+            'izin_jenis' => $pekerjaIzinJenis,
+        ];
     }
 
+    // ============================================================
+    // HITUNG TOTAL PANEN BULAN INI (UNTUK STATISTIK)
+    // ============================================================
     $totalPanen = LaporanPanen::whereIn('pekerja_id', $pekerjaList->pluck('id'))
         ->whereMonth('tanggal', now('Asia/Jakarta')->month)
         ->whereYear('tanggal', now('Asia/Jakarta')->year)
         ->sum('brondolan_kg');
 
+    // ============================================================
+    // CEK CHECKOUT TERLALU CEPAT UNTUK MANDOR
+    // ============================================================
     $isCheckoutTooEarly = false;
     $checkoutEarlyMessage = '';
     
@@ -463,10 +545,14 @@ public function mandorDashboard()
         'absenHariIni',
         'monthlyCount',
         'pekerjaList',
+        'detailAnggota',
         'totalPekerja',
         'pekerjaHadir',
         'pekerjaTepatWaktu',
         'pekerjaTerlambat',
+        'pekerjaIzin',
+        'pekerjaSakit',
+        'pekerjaAlpa',
         'totalPanen',
         'isCheckoutTooEarly',
         'checkoutEarlyMessage',

@@ -144,7 +144,7 @@ if ($checkInTime->gt($batasWaktu)) {
         if ($status == 'terlambat') {
             $message = ' Check In berhasil, tapi Anda TERLAMBAT! Batas check in adalah pukul 07:30.';
         } else {
-            $message = '✅ Check In berhasil! Selamat bekerja.';
+            $message = ' Check In berhasil! Selamat bekerja.';
         }
 
         return back()->with('success', $message);

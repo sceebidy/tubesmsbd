@@ -7,17 +7,17 @@
         {{-- HEADER --}}
         <div class="mb-6 md:mb-8 pb-4 md:pb-5 border-b border-[#E2E8F0]">
             <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
-                <div class="flex items-center gap-3 md:gap-4">
-                    <div class="w-10 h-10 md:w-14 md:h-14 bg-[#eaf4f1] rounded-xl md:rounded-2xl flex items-center justify-center flex-shrink-0">
-                        <svg class="w-5 h-5 md:w-8 md:h-8 text-[#2c5e4e]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"></path>
-                        </svg>
-                    </div>
-                    <div>
-                        <p class="text-xs text-gray-500 uppercase tracking-wide mb-0.5">Dashboard</p>
-                        <h1 class="text-xl md:text-3xl font-bold text-[#2c5e4e]">Sistem Absensi</h1>
-                    </div>
-                </div>
+            <div class="flex items-center gap-3 md:gap-4">
+    <div class="w-10 h-10 md:w-14 md:h-14 bg-[#eaf4f1] rounded-xl md:rounded-2xl flex items-center justify-center flex-shrink-0">
+        <svg class="w-5 h-5 md:w-8 md:h-8 text-[#2c5e4e]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"/>
+        </svg>
+    </div>
+    <div>
+        <p class="text-xs text-gray-500 uppercase tracking-wide mb-0.5">Dashboard</p>
+        <h1 class="text-xl md:text-3xl font-bold text-[#2c5e4e]">Sistem Absensi</h1>
+    </div>
+</div>
                 <div class="flex items-center gap-4">
                     <div class="text-right">
                         <p class="text-xs md:text-sm text-gray-500">{{ now('Asia/Jakarta')->translatedFormat('l, j F Y') }}</p>
@@ -137,7 +137,7 @@
                             @if(!$attendanceToday)
                                 Belum Masuk
                             @elseif(!$attendanceToday->check_out)
-                                Sedang Bekerja
+                                Bekerja
                             @else
                                 Selesai
                             @endif
@@ -187,19 +187,19 @@
             </div>
 
             @if(Auth::user()->role == 'user')
-            <div class="bg-white rounded-xl md:rounded-2xl p-4 md:p-5 border border-[#E2E8F0] shadow-sm hover:shadow-md transition-all duration-200">
-                <div class="flex items-start justify-between">
-                    <div class="flex-1 min-w-0">
-                        <p class="text-xs font-medium text-gray-500 uppercase tracking-wide">Panen Bulan Ini</p>
-                        <p class="text-xl md:text-2xl font-bold text-[#2c5e4e] mt-1">{{ number_format($monthlyPalmWeight ?? 0, 1) }} <span class="text-sm md:text-base font-normal text-gray-500">Kg</span></p>
-                    </div>
-                    <div class="w-10 h-10 md:w-12 md:h-12 rounded-xl bg-[#eaf4f1] flex items-center justify-center flex-shrink-0 ml-3">
-                        <svg class="w-5 h-5 md:w-6 md:h-6 text-[#2c5e4e]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path>
-                        </svg>
-                    </div>
-                </div>
-            </div>
+         <div class="bg-white rounded-xl md:rounded-2xl p-4 md:p-5 border border-[#E2E8F0] shadow-sm hover:shadow-md transition-all duration-200">
+    <div class="flex items-start justify-between">
+        <div class="flex-1 min-w-0">
+            <p class="text-xs font-medium text-gray-500 uppercase tracking-wide">Panen Bulan Ini</p>
+            <p class="text-xl md:text-2xl font-bold text-[#2c5e4e] mt-1">{{ number_format($monthlyPalmWeight ?? 0, 1) }} <span class="text-sm md:text-base font-normal text-gray-500">Kg</span></p>
+        </div>
+        <div class="w-10 h-10 md:w-12 md:h-12 rounded-xl bg-[#eaf4f1] flex items-center justify-center flex-shrink-0 ml-3">
+            <svg class="w-5 h-5 md:w-6 md:h-6 text-[#2c5e4e]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 2L6 8H9L5 14H8L4 20H8L12 22L16 20H20L16 14H19L15 8H18L12 2Z"/>
+            </svg>
+        </div>
+    </div>
+</div>
             @endif
 
             @if(Auth::user()->role == 'cleaning')
@@ -259,109 +259,146 @@
             </button>
         </div>
 
+        
         {{-- TAB: STATUS HARI INI --}}
-        <div id="tab-today" class="tab-content">
-            <div class="bg-white rounded-xl md:rounded-2xl shadow-sm border border-[#E2E8F0] overflow-hidden">
-                <div class="px-4 md:px-7 py-4 md:py-5 border-b border-[#eaf4f1] flex items-center gap-3">
-                    <svg class="w-5 h-5 md:w-6 md:h-6 text-[#2c5e4e] flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
-                    </svg>
-                    <h2 class="text-base md:text-lg font-semibold text-gray-700">Rincian Kehadiran Hari Ini</h2>
-                </div>
-                <div class="p-4 md:p-7">
-                    @if($attendanceToday)
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
-                        <div class="bg-[#e8f5f0] rounded-xl p-4 md:p-6 border border-[#2e7d5e]/20">
-                            <div class="flex items-center gap-3 mb-4">
-                                <div class="w-8 h-8 md:w-10 md:h-10 rounded-full bg-[#2e7d5e]/20 flex items-center justify-center flex-shrink-0">
-                                    <svg class="w-4 h-4 md:w-5 md:h-5 text-[#2e7d5e]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1"></path>
-                                    </svg>
-                                </div>
-                                <h3 class="font-bold text-gray-800 text-sm md:text-base">Check In</h3>
-                            </div>
-                            <div class="space-y-3">
-                                <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center py-2 border-b border-[#2e7d5e]/10 gap-1">
-                                    <span class="text-xs md:text-sm text-gray-600">Jam Masuk</span>
-                                    <span class="font-semibold text-gray-800 text-sm md:text-base">{{ $attendanceToday->check_in ? \Carbon\Carbon::parse($attendanceToday->check_in)->format('H:i:s') : '—' }}</span>
-                                </div>
-                                <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center py-2 border-b border-[#2e7d5e]/10 gap-1">
-                                    <span class="text-xs md:text-sm text-gray-600">Status</span>
-                                    <span class="px-2 md:px-3 py-1 rounded-full text-xs font-semibold w-fit
-                                        {{ $attendanceToday->status == 'tepat waktu' ? 'bg-[#e8f5f0] text-[#2e7d5e]' : 'bg-[#FDECEA] text-[#C0392B]' }}">
-                                        {{ ucfirst($attendanceToday->status) }}
-                                    </span>
-                                </div>
-                                @if($attendanceToday->photo_path)
-                                <div>
-                                    <span class="text-xs md:text-sm text-gray-600 block mb-1">Foto</span>
-                                    <img src="{{ asset('storage/'.$attendanceToday->photo_path) }}" class="w-16 h-16 md:w-20 md:h-20 rounded-xl object-cover border-2 border-white shadow-sm" alt="Foto check in">
-                                </div>
-                                @endif
-                            </div>
-                        </div>
-
-                        <div class="bg-[#eaf4f1] rounded-xl p-4 md:p-6 border border-[#2c5e4e]/20">
-                            <div class="flex items-center gap-3 mb-4">
-                                <div class="w-8 h-8 md:w-10 md:h-10 rounded-full bg-[#2c5e4e]/20 flex items-center justify-center flex-shrink-0">
-                                    <svg class="w-4 h-4 md:w-5 md:h-5 text-[#2c5e4e]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path>
-                                    </svg>
-                                </div>
-                                <h3 class="font-bold text-gray-800 text-sm md:text-base">Check Out</h3>
-                            </div>
-                            @if($attendanceToday->check_out)
-                            <div class="space-y-3">
-                                <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center py-2 border-b border-[#2c5e4e]/10 gap-1">
-                                    <span class="text-xs md:text-sm text-gray-600">Jam Pulang</span>
-                                    <span class="font-semibold text-gray-800 text-sm md:text-base">{{ \Carbon\Carbon::parse($attendanceToday->check_out)->format('H:i:s') }}</span>
-                                </div>
-                                @if(Auth::user()->role == 'user')
-                                <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center py-2 border-b border-[#2c5e4e]/10 gap-1">
-                                    <span class="text-xs md:text-sm text-gray-600">Panen Hari Ini</span>
-                                    <span class="font-semibold text-[#2c5e4e] text-sm md:text-base">{{ number_format($todayPalmWeight ?? 0, 2) }} Kg</span>
-                                </div>
-                                @endif
-                                @if($attendanceToday->checkout_photo_path)
-                                <div>
-                                    <span class="text-xs md:text-sm text-gray-600 block mb-1">Foto</span>
-                                    <img src="{{ asset('storage/'.$attendanceToday->checkout_photo_path) }}" class="w-16 h-16 md:w-20 md:h-20 rounded-xl object-cover border-2 border-white shadow-sm" alt="Foto check out">
-                                </div>
-                                @endif
-                            </div>
-                            @else
-                            <div class="text-center py-6 md:py-8">
-                                <svg class="w-10 h-10 md:w-12 md:h-12 mx-auto text-gray-400 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                                </svg>
-                                <p class="text-gray-500 text-sm md:text-base">Belum Check Out</p>
-                                <p class="text-xs text-gray-400 mt-1">Anda masih dalam sesi kerja</p>
-                            </div>
-                            @endif
-                        </div>
-                    </div>
-                    @else
-                    <div class="text-center py-8 md:py-12">
-                        <div class="w-16 h-16 md:w-20 md:h-20 bg-[#eaf4f1] rounded-full flex items-center justify-center mx-auto mb-4">
-                            <svg class="w-8 h-8 md:w-10 md:h-10 text-[#2c5e4e]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path>
+<div id="tab-today" class="tab-content">
+    <div class="bg-white rounded-xl md:rounded-2xl shadow-sm border border-[#E2E8F0] overflow-hidden">
+        <div class="px-4 md:px-7 py-4 md:py-5 border-b border-[#eaf4f1] flex items-center gap-3">
+            <svg class="w-5 h-5 md:w-6 md:h-6 text-[#2c5e4e] flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
+            </svg>
+            <h2 class="text-base md:text-lg font-semibold text-gray-700">Kehadiran Hari Ini</h2>
+        </div>
+        <div class="p-4 md:p-7">
+            @if($attendanceToday)
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
+                {{-- CHECK IN CARD --}}
+                <div class="bg-[#e8f5f0] rounded-xl p-4 md:p-6 border border-[#2e7d5e]/20">
+                    <div class="flex items-center gap-3 mb-4">
+                        <div class="w-8 h-8 md:w-10 md:h-10 rounded-full bg-[#2e7d5e]/20 flex items-center justify-center flex-shrink-0">
+                            <svg class="w-4 h-4 md:w-5 md:h-5 text-[#2e7d5e]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1"></path>
                             </svg>
                         </div>
-                        <h3 class="text-base md:text-lg font-semibold text-gray-800">Belum Ada Absensi Hari Ini</h3>
-                        <p class="text-sm text-gray-500 mt-1">Silakan buka tab Form Absensi untuk mulai</p>
+                        <h3 class="font-bold text-gray-800 text-sm md:text-base">Check In</h3>
+                    </div>
+                    <div class="space-y-3">
+                        <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center py-2 border-b border-[#2e7d5e]/10 gap-1">
+                            <span class="text-xs md:text-sm text-gray-600">Jam Masuk</span>
+                            <span class="font-semibold text-gray-800 text-sm md:text-base">{{ $attendanceToday->check_in ? \Carbon\Carbon::parse($attendanceToday->check_in)->format('H:i:s') : '—' }}</span>
+                        </div>
+                      
+                        {{-- LOKASI CHECK IN (ALAMAT LENGKAP) --}}
+                        <div class="flex flex-col py-2 border-b border-[#2e7d5e]/10 gap-1">
+                            <span class="text-xs md:text-sm text-gray-600 flex items-center gap-1">
+                                <svg class="w-3 h-3 md:w-4 md:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                                </svg>
+                                Lokasi Check In
+                            </span>
+                            <span class="text-xs md:text-sm text-gray-700 break-words">
+                                {{ $attendanceToday->checkin_address ?? ($attendanceToday->checkin_latitude && $attendanceToday->checkin_longitude ? $attendanceToday->checkin_latitude . ', ' . $attendanceToday->checkin_longitude : 'Tidak tersedia') }}
+                            </span>
+                            @if($attendanceToday->checkin_latitude && $attendanceToday->checkin_longitude)
+                            <a href="https://maps.google.com/?q={{ $attendanceToday->checkin_latitude }},{{ $attendanceToday->checkin_longitude }}" target="_blank" class="text-xs text-blue-500 hover:underline mt-1 inline-flex items-center gap-1">
+                                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path>
+                                </svg>
+                                Lihat di Google Maps
+                            </a>
+                            @endif
+                        </div>
+                        @if($attendanceToday->photo_path)
+                        <div>
+                            <span class="text-xs md:text-sm text-gray-600 block mb-1">Foto</span>
+                            <img src="{{ asset('storage/'.$attendanceToday->photo_path) }}" class="w-16 h-16 md:w-20 md:h-20 rounded-xl object-cover border-2 border-white shadow-sm" alt="Foto check in">
+                        </div>
+                        @endif
+                    </div>
+                </div>
+
+                {{-- CHECK OUT CARD --}}
+                <div class="bg-[#eaf4f1] rounded-xl p-4 md:p-6 border border-[#2c5e4e]/20">
+                    <div class="flex items-center gap-3 mb-4">
+                        <div class="w-8 h-8 md:w-10 md:h-10 rounded-full bg-[#2c5e4e]/20 flex items-center justify-center flex-shrink-0">
+                            <svg class="w-4 h-4 md:w-5 md:h-5 text-[#2c5e4e]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path>
+                            </svg>
+                        </div>
+                        <h3 class="font-bold text-gray-800 text-sm md:text-base">Check Out</h3>
+                    </div>
+                    @if($attendanceToday->check_out)
+                    <div class="space-y-3">
+                        <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center py-2 border-b border-[#2c5e4e]/10 gap-1">
+                            <span class="text-xs md:text-sm text-gray-600">Jam Pulang</span>
+                            <span class="font-semibold text-gray-800 text-sm md:text-base">{{ \Carbon\Carbon::parse($attendanceToday->check_out)->format('H:i:s') }}</span>
+                        </div>
+                        @if(Auth::user()->role == 'user')
+                        <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center py-2 border-b border-[#2c5e4e]/10 gap-1">
+                            <span class="text-xs md:text-sm text-gray-600">Panen Hari Ini</span>
+                            <span class="font-semibold text-[#2c5e4e] text-sm md:text-base">{{ number_format($todayPalmWeight ?? 0, 2) }} Kg</span>
+                        </div>
+                        @endif
+                        {{-- LOKASI CHECK OUT (ALAMAT LENGKAP) --}}
+                        <div class="flex flex-col py-2 border-b border-[#2c5e4e]/10 gap-1">
+                            <span class="text-xs md:text-sm text-gray-600 flex items-center gap-1">
+                                <svg class="w-3 h-3 md:w-4 md:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                                </svg>
+                                Lokasi Check Out
+                            </span>
+                            <span class="text-xs md:text-sm text-gray-700 break-words">
+                                {{ $attendanceToday->checkout_address ?? ($attendanceToday->checkout_latitude && $attendanceToday->checkout_longitude ? $attendanceToday->checkout_latitude . ', ' . $attendanceToday->checkout_longitude : 'Tidak tersedia') }}
+                            </span>
+                            @if($attendanceToday->checkout_latitude && $attendanceToday->checkout_longitude)
+                            <a href="https://maps.google.com/?q={{ $attendanceToday->checkout_latitude }},{{ $attendanceToday->checkout_longitude }}" target="_blank" class="text-xs text-blue-500 hover:underline mt-1 inline-flex items-center gap-1">
+                                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path>
+                                </svg>
+                                Lihat di Google Maps
+                            </a>
+                            @endif
+                        </div>
+                        @if($attendanceToday->checkout_photo_path)
+                        <div>
+                            <span class="text-xs md:text-sm text-gray-600 block mb-1">Foto</span>
+                            <img src="{{ asset('storage/'.$attendanceToday->checkout_photo_path) }}" class="w-16 h-16 md:w-20 md:h-20 rounded-xl object-cover border-2 border-white shadow-sm" alt="Foto check out">
+                        </div>
+                        @endif
+                    </div>
+                    @else
+                    <div class="text-center py-6 md:py-8">
+                        <svg class="w-10 h-10 md:w-12 md:h-12 mx-auto text-gray-400 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                        <p class="text-gray-500 text-sm md:text-base">Belum Check Out</p>
+                        <p class="text-xs text-gray-400 mt-1">Anda masih dalam sesi kerja</p>
                     </div>
                     @endif
                 </div>
             </div>
+            @else
+            <div class="text-center py-8 md:py-12">
+                <div class="w-16 h-16 md:w-20 md:h-20 bg-[#eaf4f1] rounded-full flex items-center justify-center mx-auto mb-4">
+                    <svg class="w-8 h-8 md:w-10 md:h-10 text-[#2c5e4e]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path>
+                    </svg>
+                </div>
+                <h3 class="text-base md:text-lg font-semibold text-gray-800">Belum Ada Absensi Hari Ini</h3>
+                <p class="text-sm text-gray-500 mt-1">Silakan buka tab Form Absensi untuk mulai</p>
+            </div>
+            @endif
         </div>
+    </div>
+</div>
 
         {{-- TAB: FORM ABSENSI DENGAN LIVE CAMERA --}}
         <div id="tab-absen" class="tab-content hidden">
             <div class="bg-white rounded-xl md:rounded-2xl shadow-sm border border-[#E2E8F0] overflow-hidden">
                 <div class="px-4 md:px-7 py-4 md:py-5 border-b border-[#eaf4f1] flex items-center gap-3">
-                    <svg class="w-5 h-5 md:w-6 md:h-6 text-[#2c5e4e] flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
-                    </svg>
+                    
                     <h2 class="text-base md:text-lg font-semibold text-gray-700">
                         @if(!$attendanceToday)
                             Form Check In
@@ -467,11 +504,9 @@
                     @if(!$canCheckout)
                     <div class="mb-5 p-4 bg-amber-50 border-l-4 border-amber-500 rounded-xl">
                         <div class="flex items-start gap-3">
-                            <svg class="w-5 h-5 text-amber-600 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
-                            </svg>
+                        
                             <div class="flex-1">
-                                <p class="font-semibold text-amber-800 text-sm">⚠️ BELUM BISA CHECKOUT!</p>
+                                <p class="font-semibold text-amber-800 text-sm">BELUM BISA CHECKOUT!</p>
                                 <p class="text-sm text-amber-700 mt-1">{{ $checkoutWarningMessage }}</p>
                                 <a href="{{ $checkoutRedirectRoute }}" class="inline-flex items-center gap-2 mt-3 text-sm font-semibold text-amber-800 hover:text-amber-900">
                                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
