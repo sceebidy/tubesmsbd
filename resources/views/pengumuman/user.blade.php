@@ -5,7 +5,7 @@
     <div class="container mx-auto px-4 sm:px-6 lg:px-8">
 
         {{-- ============================================================ --}}
-        {{-- HEADER DENGAN IKON MEGAPHONE (PENGUMUMAN) --}}
+        {{-- HEADER --}}
         {{-- ============================================================ --}}
         <div class="mb-8 pb-5 border-b border-gray-200">
             <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
@@ -16,7 +16,6 @@
                         </svg>
                     </div>
                     <div>
-                    
                         <h1 class="text-2xl md:text-3xl font-bold text-[#2c5e4e]">Pengumuman</h1>
                         <p class="text-sm text-gray-500 mt-1">Informasi terbaru untuk Anda</p>
                     </div>
@@ -63,12 +62,30 @@
         {{-- ============================================================ --}}
         {{-- LIST PENGUMUMAN --}}
         {{-- ============================================================ --}}
+        @php
+            $userRole = auth()->user()->role;
+            $roleLabels = [
+                'user'     => 'User',
+                'mandor'   => 'Mandor',
+                'security' => 'Security',
+                'cleaning' => 'Cleaning',
+                'kantoran' => 'Kantoran',
+            ];
+        @endphp
+
         @if($announcements->count())
         <div class="space-y-4">
             @foreach($announcements as $announcement)
-            @php $isPersonal = !is_null($announcement->target_users); @endphp
-            <div class="bg-white rounded-2xl p-5 md:p-6 border shadow-sm transition-all duration-200 hover:shadow-md hover:-translate-y-0.5
-                {{ $isPersonal ? 'border-amber-200 hover:border-amber-300' : 'border-gray-200 hover:border-[#d0e9e3]' }}">
+            @php
+                $isPersonal = !is_null($announcement->target_users);
+                $isRoleTarget = !$isPersonal && !is_null($announcement->target_roles);
+
+                $cardBorder = $isPersonal
+                    ? 'border-amber-200 hover:border-amber-300'
+                    : ($isRoleTarget ? 'border-blue-200 hover:border-blue-300' : 'border-gray-200 hover:border-[#d0e9e3]');
+            @endphp
+
+            <div class="bg-white rounded-2xl p-5 md:p-6 border shadow-sm transition-all duration-200 hover:shadow-md hover:-translate-y-0.5 {{ $cardBorder }}">
 
                 {{-- Title row --}}
                 <div class="flex items-start justify-between gap-3 mb-3">
@@ -80,6 +97,8 @@
                         </div>
                         <h3 class="text-base font-semibold text-gray-800 leading-snug">{{ $announcement->judul }}</h3>
                     </div>
+
+                    {{-- Badge: Khusus Anda (by user ID) --}}
                     @if($isPersonal)
                     <span class="flex-shrink-0 inline-flex items-center gap-1 bg-amber-50 text-amber-800 border border-amber-200 px-2.5 py-1 rounded-full text-xs font-semibold">
                         <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
@@ -87,10 +106,19 @@
                         </svg>
                         Khusus Anda
                     </span>
+
+                    {{-- Badge: Khusus Role (by role) --}}
+                    @elseif($isRoleTarget)
+                    <span class="flex-shrink-0 inline-flex items-center gap-1 bg-blue-50 text-blue-800 border border-blue-200 px-2.5 py-1 rounded-full text-xs font-semibold">
+                        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z"/>
+                        </svg>
+                        {{ $roleLabels[$userRole] ?? ucfirst($userRole) }}
+                    </span>
                     @endif
                 </div>
 
-                <div class="h-px {{ $isPersonal ? 'bg-amber-100' : 'bg-[#eaf4f1]' }} my-3 rounded-full"></div>
+                <div class="h-px {{ $isPersonal ? 'bg-amber-100' : ($isRoleTarget ? 'bg-blue-100' : 'bg-[#eaf4f1]') }} my-3 rounded-full"></div>
 
                 <p class="text-sm text-gray-600 leading-relaxed mb-4">{{ $announcement->isi }}</p>
 
@@ -111,13 +139,21 @@
                         </span>
                         @endif
                     </div>
-                    
+
+                    {{-- Label bawah sesuai jenis target --}}
                     @if($isPersonal)
                     <span class="inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium bg-[#eaf4f1] text-[#2c5e4e]">
                         <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
                         </svg>
                         Personal
+                    </span>
+                    @elseif($isRoleTarget)
+                    <span class="inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium bg-blue-50 text-blue-700">
+                        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0"/>
+                        </svg>
+                        Grup {{ $roleLabels[$userRole] ?? ucfirst($userRole) }}
                     </span>
                     @endif
                 </div>

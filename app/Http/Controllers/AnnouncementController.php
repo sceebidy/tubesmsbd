@@ -17,7 +17,10 @@ class AnnouncementController extends Controller
                              ->orderBy('name')
                              ->get();
 
-        return view('pengumuman.admin', compact('announcements', 'pegawaiList'));
+        // Daftar role yang tersedia (sesuaikan dengan role di sistem Anda)
+        $roleList = ['user', 'mandor', 'security', 'cleaning', 'kantoran'];
+
+        return view('pengumuman.admin', compact('announcements', 'pegawaiList', 'roleList'));
     }
 
     public function store(Request $request)
@@ -25,24 +28,31 @@ class AnnouncementController extends Controller
         $request->validate([
             'judul'        => 'required|string|max:255',
             'isi'          => 'required|string',
-            'target_type'  => 'required|in:all,specific',
+            'target_type'  => 'required|in:all,specific,role',
             'target_users' => 'required_if:target_type,specific|array|min:1',
             'target_users.*' => 'exists:users,id',
+            'target_roles' => 'required_if:target_type,role|array|min:1',
+            'target_roles.*' => 'string',
         ], [
             'target_users.required_if' => 'Pilih minimal satu pegawai yang dituju.',
+            'target_roles.required_if' => 'Pilih minimal satu role yang dituju.',
         ]);
 
-        // $casts = 'array' pada model otomatis encode saat simpan,
-        // jadi tidak perlu json_encode manual di sini.
-        $targetUsers = $request->target_type === 'specific'
-            ? $request->target_users   // array dari form
-            : null;
+        $targetUsers = null;
+        $targetRoles = null;
+
+        if ($request->target_type === 'specific') {
+            $targetUsers = $request->target_users;
+        } elseif ($request->target_type === 'role') {
+            $targetRoles = $request->target_roles;
+        }
 
         $announcement = Announcement::create([
             'judul'        => $request->judul,
             'isi'          => $request->isi,
             'created_by'   => auth()->id(),
             'target_users' => $targetUsers,
+            'target_roles' => $targetRoles,
         ]);
 
         broadcast(new NewAnnouncementEvent($announcement))->toOthers();
@@ -61,19 +71,24 @@ class AnnouncementController extends Controller
     // =================== USER ===================
     public function showToUsers()
     {
-        $userId = auth()->id();
+        $userId   = auth()->id();
+        $userRole = auth()->user()->role;
 
-        // target_users sudah di-cast ke array oleh model ($casts = ['target_users' => 'array']).
-        // null  = siaran umum (tampilkan ke semua)
-        // array = hanya tampilkan ke user yang ID-nya ada di array
         $announcements = Announcement::latest()
             ->get()
-            ->filter(function ($a) use ($userId) {
-                if (is_null($a->target_users)) {
-                    return true; // siaran umum
+            ->filter(function ($a) use ($userId, $userRole) {
+                // Prioritas 1: target berdasarkan ID pegawai spesifik
+                if (!is_null($a->target_users)) {
+                    return in_array($userId, $a->target_users);
                 }
 
-                return in_array($userId, $a->target_users);
+                // Prioritas 2: target berdasarkan role
+                if (!is_null($a->target_roles)) {
+                    return in_array($userRole, $a->target_roles);
+                }
+
+                // Default: siaran umum
+                return true;
             })
             ->values();
 
@@ -88,7 +103,9 @@ class AnnouncementController extends Controller
                              ->orderBy('name')
                              ->get();
 
-        return view('pengumuman.manager', compact('announcements', 'pegawaiList'));
+        $roleList = ['user', 'mandor', 'security', 'cleaning', 'kantoran'];
+
+        return view('pengumuman.manager', compact('announcements', 'pegawaiList', 'roleList'));
     }
 
     public function storeManager(Request $request)
@@ -96,22 +113,31 @@ class AnnouncementController extends Controller
         $request->validate([
             'judul'        => 'required|string|max:255',
             'isi'          => 'required|string',
-            'target_type'  => 'required|in:all,specific',
+            'target_type'  => 'required|in:all,specific,role',
             'target_users' => 'required_if:target_type,specific|array|min:1',
             'target_users.*' => 'exists:users,id',
+            'target_roles' => 'required_if:target_type,role|array|min:1',
+            'target_roles.*' => 'string',
         ], [
             'target_users.required_if' => 'Pilih minimal satu pegawai yang dituju.',
+            'target_roles.required_if' => 'Pilih minimal satu role yang dituju.',
         ]);
 
-        $targetUsers = $request->target_type === 'specific'
-            ? $request->target_users   // array dari form
-            : null;
+        $targetUsers = null;
+        $targetRoles = null;
+
+        if ($request->target_type === 'specific') {
+            $targetUsers = $request->target_users;
+        } elseif ($request->target_type === 'role') {
+            $targetRoles = $request->target_roles;
+        }
 
         $announcement = Announcement::create([
             'judul'        => $request->judul,
             'isi'          => $request->isi,
             'created_by'   => auth()->id(),
             'target_users' => $targetUsers,
+            'target_roles' => $targetRoles,
         ]);
 
         broadcast(new NewAnnouncementEvent($announcement))->toOthers();

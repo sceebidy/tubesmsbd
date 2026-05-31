@@ -6,15 +6,19 @@ use Illuminate\Database\Eloquent\Model;
 
 class Announcement extends Model
 {
-    protected $fillable = ['judul', 'isi', 'created_by', 'target_users'];
+    protected $fillable = ['judul', 'isi', 'created_by', 'target_users', 'target_roles'];
 
     /**
-     * Cast target_users ke array secara otomatis.
-     * Saat disimpan: array → JSON string di DB.
-     * Saat dibaca : JSON string → array PHP.
-     * Nilai null tetap null (artinya siaran ke semua pegawai).
+     * target_users : null = semua pegawai | array = hanya ID pegawai tertentu
+     * target_roles  : null = tidak ada filter role | array = hanya role tertentu
+     *
+     * Logika penggabungan (di controller):
+     *  - Jika target_users terisi  → tampilkan ke pegawai berdasarkan ID spesifik
+     *  - Jika target_roles terisi  → tampilkan ke pegawai berdasarkan role
+     *  - Jika keduanya null        → siaran umum (semua pegawai)
      */
     protected $casts = [
         'target_users' => 'array',
+        'target_roles' => 'array',
     ];
 }

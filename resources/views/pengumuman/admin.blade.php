@@ -64,28 +64,39 @@
                 <div>
                     <label class="block text-xs font-semibold uppercase tracking-wide text-gray-500 mb-2">Tujuan Pengumuman</label>
 
-                    <div class="flex gap-5 mb-3">
+                    <div class="flex flex-wrap gap-5 mb-3">
+                        {{-- Semua Pegawai --}}
                         <label class="flex items-center gap-2 cursor-pointer group">
                             <input type="radio" name="target_type" value="all"
                                 {{ old('target_type', 'all') === 'all' ? 'checked' : '' }}
                                 class="w-4 h-4 accent-[#2c5e4e]"
-                                onchange="togglePegawaiBox(false)">
+                                onchange="switchTargetMode('all')">
                             <span class="text-sm text-gray-700 group-hover:text-gray-900">Semua Pegawai</span>
                         </label>
+
+                        {{-- Pegawai Tertentu --}}
                         <label class="flex items-center gap-2 cursor-pointer group">
                             <input type="radio" name="target_type" value="specific"
                                 {{ old('target_type') === 'specific' ? 'checked' : '' }}
                                 class="w-4 h-4 accent-[#2c5e4e]"
-                                onchange="togglePegawaiBox(true)">
+                                onchange="switchTargetMode('specific')">
                             <span class="text-sm text-gray-700 group-hover:text-gray-900">Pegawai Tertentu</span>
+                        </label>
+
+                        {{-- Role Tertentu --}}
+                        <label class="flex items-center gap-2 cursor-pointer group">
+                            <input type="radio" name="target_type" value="role"
+                                {{ old('target_type') === 'role' ? 'checked' : '' }}
+                                class="w-4 h-4 accent-[#2c5e4e]"
+                                onchange="switchTargetMode('role')">
+                            <span class="text-sm text-gray-700 group-hover:text-gray-900">Role Tertentu</span>
                         </label>
                     </div>
 
-                    {{-- Selector Pegawai --}}
+                    {{-- Selector Pegawai Spesifik --}}
                     <div id="pegawaiBox"
                         class="{{ old('target_type') === 'specific' ? '' : 'hidden' }} border border-gray-200 rounded-xl overflow-hidden">
 
-                        {{-- Header selector --}}
                         <div class="flex items-center justify-between px-3 py-2.5 bg-gray-50 border-b border-gray-200">
                             <p class="text-xs font-semibold text-gray-500 uppercase tracking-wide">Pilih Pegawai</p>
                             <button type="button" id="toggleAllBtn" onclick="toggleAllPegawai()"
@@ -94,7 +105,6 @@
                             </button>
                         </div>
 
-                        {{-- Search --}}
                         <div class="px-3 pt-3 pb-2 border-b border-gray-100">
                             <div class="relative">
                                 <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-gray-400 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -106,7 +116,6 @@
                             </div>
                         </div>
 
-                        {{-- List --}}
                         <div id="pegawaiList" class="max-h-52 overflow-y-auto divide-y divide-gray-50">
                             @foreach($pegawaiList as $p)
                             <label class="pegawai-item flex items-center gap-3 px-3 py-2.5 hover:bg-gray-50 cursor-pointer transition-colors"
@@ -133,12 +142,58 @@
                             @endforeach
                         </div>
 
-                        {{-- Counter --}}
                         <div class="px-3 py-2 bg-gray-50 border-t border-gray-200">
                             <p id="selectedCount" class="text-xs text-gray-400">0 pegawai dipilih</p>
                         </div>
                     </div>
+
+                    {{-- Selector Role --}}
+                    <div id="roleBox"
+                        class="{{ old('target_type') === 'role' ? '' : 'hidden' }} border border-gray-200 rounded-xl overflow-hidden">
+
+                        <div class="px-3 py-2.5 bg-gray-50 border-b border-gray-200">
+                            <p class="text-xs font-semibold text-gray-500 uppercase tracking-wide">Pilih Role</p>
+                        </div>
+
+                        <div class="p-3 grid grid-cols-2 sm:grid-cols-3 gap-2">
+                            @php
+                                $roleColors = [
+                                    'user'     => ['bg' => 'bg-[#eaf4f1]',   'text' => 'text-[#2c5e4e]',  'border' => 'border-[#2c5e4e]/30',  'check' => 'accent-[#2c5e4e]'],
+                                    'mandor'   => ['bg' => 'bg-amber-50',     'text' => 'text-amber-800',  'border' => 'border-amber-200',      'check' => 'accent-amber-600'],
+                                    'security' => ['bg' => 'bg-blue-50',      'text' => 'text-blue-800',   'border' => 'border-blue-200',       'check' => 'accent-blue-600'],
+                                    'cleaning' => ['bg' => 'bg-purple-50',    'text' => 'text-purple-800', 'border' => 'border-purple-200',     'check' => 'accent-purple-600'],
+                                    'kantoran' => ['bg' => 'bg-rose-50',      'text' => 'text-rose-800',   'border' => 'border-rose-200',       'check' => 'accent-rose-600'],
+                                ];
+                                $roleLabels = [
+                                    'user'     => 'User',
+                                    'mandor'   => 'Mandor',
+                                    'security' => 'Security',
+                                    'cleaning' => 'Cleaning',
+                                    'kantoran' => 'Kantoran',
+                                ];
+                            @endphp
+                            @foreach($roleList as $role)
+                            @php $rc = $roleColors[$role] ?? ['bg'=>'bg-gray-50','text'=>'text-gray-700','border'=>'border-gray-200','check'=>'accent-gray-500']; @endphp
+                            <label class="role-item flex items-center gap-2.5 px-3 py-2.5 rounded-xl border cursor-pointer transition-all hover:shadow-sm
+                                {{ $rc['bg'] }} {{ $rc['border'] }}
+                                {{ is_array(old('target_roles')) && in_array($role, old('target_roles')) ? 'ring-2 ring-offset-1 ring-[#2c5e4e]/40' : '' }}">
+                                <input type="checkbox" name="target_roles[]" value="{{ $role }}"
+                                    {{ is_array(old('target_roles')) && in_array($role, old('target_roles')) ? 'checked' : '' }}
+                                    class="w-4 h-4 {{ $rc['check'] }} flex-shrink-0 role-checkbox">
+                                <span class="text-sm font-semibold {{ $rc['text'] }} capitalize">{{ $roleLabels[$role] ?? ucfirst($role) }}</span>
+                            </label>
+                            @endforeach
+                        </div>
+
+                        <div class="px-3 py-2 bg-gray-50 border-t border-gray-200">
+                            <p id="selectedRoleCount" class="text-xs text-gray-400">0 role dipilih</p>
+                        </div>
+                    </div>
+
                     @error('target_users')
+                        <p class="text-xs text-red-500 mt-1.5">{{ $message }}</p>
+                    @enderror
+                    @error('target_roles')
                         <p class="text-xs text-red-500 mt-1.5">{{ $message }}</p>
                     @enderror
                 </div>
@@ -156,19 +211,50 @@
         {{-- List Pengumuman --}}
         <div class="space-y-4">
             @forelse($announcements as $a)
-            @php $targets = $a->target_users; @endphp
-            <div class="bg-white rounded-2xl p-5 md:p-6 border shadow-sm transition-all duration-200 hover:shadow-md
-                {{ $targets ? 'border-amber-200 hover:border-amber-300' : 'border-gray-200 hover:border-[#d0e9e3]' }}">
+            @php
+                $targets = $a->target_users;
+                $roles   = $a->target_roles;
+
+                $roleColors = [
+                    'user'     => 'bg-[#eaf4f1] text-[#2c5e4e] border-[#2c5e4e]/20',
+                    'mandor'   => 'bg-amber-50 text-amber-800 border-amber-200',
+                    'security' => 'bg-blue-50 text-blue-800 border-blue-200',
+                    'cleaning' => 'bg-purple-50 text-purple-800 border-purple-200',
+                    'kantoran' => 'bg-rose-50 text-rose-800 border-rose-200',
+                ];
+                $roleLabels = [
+                    'user'     => 'User',
+                    'mandor'   => 'Mandor',
+                    'security' => 'Security',
+                    'cleaning' => 'Cleaning',
+                    'kantoran' => 'Kantoran',
+                ];
+
+                $cardBorder = $targets
+                    ? 'border-amber-200 hover:border-amber-300'
+                    : ($roles ? 'border-blue-200 hover:border-blue-300' : 'border-gray-200 hover:border-[#d0e9e3]');
+            @endphp
+
+            <div class="bg-white rounded-2xl p-5 md:p-6 border shadow-sm transition-all duration-200 hover:shadow-md {{ $cardBorder }}">
 
                 <div class="flex flex-wrap justify-between items-start gap-3 mb-3">
                     <div class="flex items-center flex-wrap gap-2">
                         <h3 class="text-base font-semibold text-gray-800">{{ $a->judul }}</h3>
+
+                        {{-- Badge target --}}
                         @if($targets)
                             <span class="inline-flex items-center gap-1 bg-amber-50 text-amber-800 border border-amber-200 px-2.5 py-0.5 rounded-full text-xs font-semibold">
                                 <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
                                     <path stroke-linecap="round" stroke-linejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
                                 </svg>
                                 {{ count($targets) }} pegawai
+                            </span>
+                        @elseif($roles)
+                            <span class="inline-flex items-center gap-1 bg-blue-50 text-blue-800 border border-blue-200 px-2.5 py-0.5 rounded-full text-xs font-semibold">
+                                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z"/>
+                                </svg>
+                                {{ count($roles) }} role
                             </span>
                         @else
                             <span class="inline-flex items-center gap-1 bg-[#eaf4f1] text-[#2c5e4e] border border-[#2c5e4e]/20 px-2.5 py-0.5 rounded-full text-xs font-semibold">
@@ -179,6 +265,7 @@
                             </span>
                         @endif
                     </div>
+
                     <form action="{{ route('admin.pengumuman.delete', $a->id) }}" method="POST" class="inline">
                         @csrf @method('DELETE')
                         <button type="submit" onclick="return confirm('Yakin ingin menghapus pengumuman ini?')"
@@ -190,7 +277,7 @@
 
                 <p class="text-sm text-gray-600 leading-relaxed mb-3">{{ $a->isi }}</p>
 
-                {{-- Target names --}}
+                {{-- Target: pegawai spesifik --}}
                 @if($targets)
                 @php $namaTarget = \App\Models\User::whereIn('id', $targets)->pluck('name'); @endphp
                 <div class="bg-amber-50 border border-amber-100 rounded-xl px-3 py-2.5 mb-3">
@@ -198,6 +285,21 @@
                     <div class="flex flex-wrap gap-1.5">
                         @foreach($namaTarget as $nama)
                         <span class="bg-white border border-amber-200 text-amber-900 text-xs font-medium px-2.5 py-1 rounded-full">{{ $nama }}</span>
+                        @endforeach
+                    </div>
+                </div>
+                @endif
+
+                {{-- Target: role --}}
+                @if($roles)
+                <div class="bg-blue-50 border border-blue-100 rounded-xl px-3 py-2.5 mb-3">
+                    <p class="text-xs font-semibold text-blue-800 mb-2">Ditujukan ke role:</p>
+                    <div class="flex flex-wrap gap-1.5">
+                        @foreach($roles as $r)
+                        @php $rc = $roleColors[$r] ?? 'bg-gray-100 text-gray-700 border-gray-200'; @endphp
+                        <span class="border text-xs font-semibold px-2.5 py-1 rounded-full capitalize {{ $rc }}">
+                            {{ $roleLabels[$r] ?? ucfirst($r) }}
+                        </span>
                         @endforeach
                     </div>
                 </div>
@@ -227,12 +329,20 @@
 </div>
 
 <script>
-function togglePegawaiBox(show) {
-    const box = document.getElementById('pegawaiBox');
-    box.classList.toggle('hidden', !show);
-    if (!show) {
+function switchTargetMode(mode) {
+    const pegawaiBox = document.getElementById('pegawaiBox');
+    const roleBox    = document.getElementById('roleBox');
+
+    pegawaiBox.classList.toggle('hidden', mode !== 'specific');
+    roleBox.classList.toggle('hidden', mode !== 'role');
+
+    if (mode !== 'specific') {
         document.querySelectorAll('#pegawaiList input[type=checkbox]').forEach(c => c.checked = false);
         updateCount();
+    }
+    if (mode !== 'role') {
+        document.querySelectorAll('.role-checkbox').forEach(c => c.checked = false);
+        updateRoleCount();
     }
 }
 
@@ -255,11 +365,20 @@ function updateCount() {
     document.getElementById('selectedCount').textContent = n + ' pegawai dipilih';
 }
 
+function updateRoleCount() {
+    const n = document.querySelectorAll('.role-checkbox:checked').length;
+    document.getElementById('selectedRoleCount').textContent = n + ' role dipilih';
+}
+
 document.addEventListener('DOMContentLoaded', function () {
     document.querySelectorAll('#pegawaiList input[type=checkbox]').forEach(cb => {
         cb.addEventListener('change', updateCount);
     });
+    document.querySelectorAll('.role-checkbox').forEach(cb => {
+        cb.addEventListener('change', updateRoleCount);
+    });
     updateCount();
+    updateRoleCount();
 });
 </script>
 @endsection

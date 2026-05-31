@@ -152,7 +152,6 @@
                                 </div>
                                 <div>
                                     <div class="font-semibold text-gray-800 text-xs md:text-sm">{{ $emp->name }}</div>
-                                    <div class="text-[10px] md:text-xs text-gray-400">ID: {{ $emp->id }}</div>
                                 </div>
                             </div>
                         </td>

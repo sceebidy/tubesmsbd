@@ -294,7 +294,6 @@
                                     </div>
                                     <div>
                                         <div class="font-semibold text-gray-800 text-sm">{{ $p->name }}</div>
-                                        <div class="text-xs text-gray-400">ID: {{ $p->id }}</div>
                                     </div>
                                 </div>
                             </td>
