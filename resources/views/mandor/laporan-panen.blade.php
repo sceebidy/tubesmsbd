@@ -79,32 +79,46 @@
                 </div>
             </div>
         @elseif(isset($sudahCheckIn) && !$sudahCheckIn)
-            <div class="mb-6 bg-red-50 border-l-4 border-red-500 rounded-lg p-5 shadow-sm">
-                <div class="flex items-center gap-4">
-                    <div class="flex-shrink-0">
-                        <svg class="w-10 h-10 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                        </svg>
-                    </div>
-                    <div class="flex-1">
-                        <p class="font-semibold text-red-800 text-lg"> AKSES DIBATASI </p>
-                        <p class="text-sm text-red-700 mt-1">
-                            <strong>Anda harus CHECK-IN terlebih dahulu</strong> sebelum dapat mengakses halaman verifikasi panen.
-                        </p>
-                        <p class="text-xs text-red-600 mt-2">
-                            Silakan lakukan check-in melalui halaman absensi untuk melanjutkan.
-                        </p>
-                    </div>
-                    <div>
-                        <a href="{{ route('attendance.index') }}" class="inline-flex items-center gap-2 bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg text-sm font-semibold transition-all">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1"></path>
-                            </svg>
-                            Kembali ke Halaman Absensi
-                        </a>
-                    </div>
-                </div>
+            <div class="mb-6 bg-red-50 border-l-4 border-red-500 rounded-lg p-4 sm:p-5 shadow-sm">
+    <div class="flex flex-col sm:flex-row sm:items-center gap-4">
+        
+        <!-- Icon + Text -->
+        <div class="flex items-start gap-3 flex-1">
+            <div class="flex-shrink-0">
+                <svg class="w-8 h-8 sm:w-10 sm:h-10 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z">
+                    </path>
+                </svg>
             </div>
+
+            <div>
+                <p class="font-semibold text-red-800 text-base sm:text-lg">
+                    BELUM CHECK IN!
+                </p>
+                <p class="text-sm text-red-700 mt-1">
+                    Anda harus melakukan check in terlebih dahulu sebelum dapat menginput panen.
+                </p>
+            </div>
+        </div>
+
+        <!-- Button -->
+        <div class="w-full sm:w-auto">
+            <a href="{{ route('attendance.index') }}"
+                class="inline-flex items-center justify-center gap-2 w-full sm:w-auto
+                       bg-red-600 hover:bg-red-700 text-white px-4 py-2.5
+                       rounded-lg text-sm font-semibold transition-all">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1">
+                    </path>
+                </svg>
+                Absen Sekarang
+            </a>
+        </div>
+
+    </div>
+</div>
         @elseif(isset($sudahVerifikasiHariIni) && $sudahVerifikasiHariIni)
             <div class="mb-6 bg-green-50 border-l-4 border-green-500 rounded-lg p-5 shadow-sm">
                 <div class="flex items-center gap-4">
