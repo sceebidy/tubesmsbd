@@ -1,61 +1,181 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# 🌿 Sipirok Indah - Sistem Manajemen Operasional & Kepegawaian
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+Sistem Manajemen Operasional & Kepegawaian **Sipirok Indah** adalah aplikasi berbasis web yang dirancang untuk mengelola operasional harian, presensi pegawai, pelaporan hasil panen, evaluasi kinerja (rapot), patroli keamanan, hingga pengajuan izin/sakit secara terintegrasi dengan kontrol akses berbasis peran (*Role-Based Access Control*).
 
-## About Laravel
+---
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+## 🚀 Fitur Utama Berdasarkan Peran (Role)
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+Aplikasi ini mendukung **7 peran pengguna (role)** dengan hak akses dan fitur yang disesuaikan:
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+### 🔴 Admin
+- **Kelola Data Pegawai**: Penambahan, pembaruan, dan penghapusan pegawai (termasuk *force delete* dengan riwayat).
+- **Approval Pengajuan Izin/Sakit**: Peninjauan dan persetujuan/penolakan surat izin atau sakit pegawai.
+- **Manajemen Rapot Kinerja**: Pembuatan evaluasi kinerja harian/bulanan, perhitungan skor otomatis, dan ekspor rapot ke format **PDF**.
+- **Log Absensi & Ekspor Data**: Rekapitulasi absensi seluruh pegawai serta ekspor laporan ke format **CSV / Excel**.
+- **Pengumuman**: Pengelolaan dan publikasi pengumuman internal perusahaan.
 
-## Learning Laravel
+### 🔵 Manager
+- **Dashboard Manajerial**: Visualisasi dan monitoring ringkasan kinerja serta operasional kepegawaian.
+- **Audit Log Absensi**: Peninjauan data kehadiran seluruh staf.
+- **Kelola Pegawai & Pengumuman**: Akses manajemen staf dan pengumuman tingkat manajerial.
+- **Laporan & Ekspor Data**: Pengunduhan rekapitulasi data operasional.
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+### 🟢 Mandor
+- **Dashboard Mandor**: Ringkasan aktivitas dan hasil kerja tim di bawah pengawasannya.
+- **Verifikasi Laporan Panen**: Peninjauan dan verifikasi hasil laporan panen harian yang diinput oleh pekerja/petani.
 
-You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
+### 🟡 Pekerja / Field User
+- **Presensi Digital**: Check-in dan Check-out kehadiran berbasis lokasi/waktu.
+- **Laporan Hasil Panen**: Input data kuantitas dan detail hasil panen harian.
+- **Pengajuan Izin/Sakit**: Form pengajuan ketidakhadiran beserta pengunggahan berkas pendukung.
+- **Rapot Saya**: Melihat riwayat evaluasi kinerja dan skor rapot pribadi.
+- **Pengumuman**: Akses informasi resmi dari manajemen.
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+### 🛡️ Security
+- **Dashboard Keamanan**: Monitoring status keamanan area kerja.
+- **Log Patroli**: Input dan pencatatan riwayat patroli rutin area perkebunan/fasilitas.
 
-## Laravel Sponsors
+### 🧹 Cleaning Service
+- **Dashboard Kebersihan**: Monitoring jadwal dan area tugas kebersihan.
+- **Log Kinerja Kebersihan**: Input laporan pemeliharaan dan kebersihan area kerja.
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+### 🏢 Staf Kantoran
+- **Presensi & Layanan Mandiri**: Absensi harian serta pengajuan izin/sakit staf administrasi.
 
-### Premium Partners
+---
 
-- **[Vehikl](https://vehikl.com)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Redberry](https://redberry.international/laravel-development)**
-- **[Active Logic](https://activelogic.com)**
+## 🛠️ Teknologi yang Digunakan
 
-## Contributing
+- **Backend**: [Laravel 12.x](https://laravel.com) (PHP >= 8.2)
+- **Frontend**: Blade Templates, [Tailwind CSS v4](https://tailwindcss.com), [Alpine.js](https://alpinejs.dev), [Vite](https://vitejs.dev)
+- **Database**: MySQL / MariaDB (atau SQLite untuk pengujian)
+- **Library Utama**:
+  - `barryvdh/laravel-dompdf`: Generator dokumen PDF untuk rapot evaluasi.
+  - `phpoffice/phpspreadsheet` & `maatwebsite/excel`: Parser dan ekspor laporan ke Excel/CSV.
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+---
 
-## Code of Conduct
+## 📋 Persyaratan Sistem
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+Sebelum menjalankan proyek ini, pastikan sistem Anda telah terinstal:
+- **PHP** >= 8.2 (dengan ekstensi `pdo_mysql`, `mbstring`, `gd`, `zip`, `openssl`, `cURL`)
+- **Composer** >= 2.x
+- **Node.js** >= 18.x & **NPM**
+- **MySQL / MariaDB Database Server**
 
-## Security Vulnerabilities
+---
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+## ⚙️ Langkah Instalasi & Konfigurasi
 
-## License
+Follow langkah-langkah berikut untuk menjalankan proyek secara lokal:
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+### 1. Clone Repository
+```bash
+git clone <repository-url>
+cd tubesmsbd
+```
+
+### 2. Install Dependensi PHP & Node.js
+```bash
+composer install
+npm install
+```
+
+### 3. Konfigurasi Environment File
+Salin file `.env.example` menjadi `.env`:
+```bash
+cp .env.example .env
+```
+Sesuaikan konfigurasi database pada file `.env`:
+```env
+DB_CONNECTION=mysql
+DB_HOST=127.0.0.1
+DB_PORT=3306
+DB_DATABASE=sipirokindah
+DB_USERNAME=root
+DB_PASSWORD=
+```
+
+### 4. Generate Application Key
+```bash
+php artisan key:generate
+```
+
+### 5. Impor Database / Migrasi & Seeder
+Anda dapat memilih salah satu dari dua cara berikut:
+
+**Opsi A: Menggunakan file SQL bawaan (`sipirokindah.sql`)**
+Buat database bernama `sipirokindah` di MySQL/phpMyAdmin, lalu impor file [sipirokindah.sql](file:///d:/Herd/tubesmsbd/sipirokindah.sql).
+
+**Opsi B: Menggunakan Migration & Seeder Laravel**
+```bash
+php artisan migrate --seed
+```
+
+### 6. Buat Symbolic Link Storage (Wajib!)
+Jalankan perintah berikut agar file unggahan (seperti lampiran pengajuan izin) dapat diakses publik:
+```bash
+php artisan storage:link
+```
+
+### 7. Jalankan Server Pengembangan
+Anda dapat menjalankan server menggunakan satu perintah composer:
+```bash
+composer run dev
+```
+Atau secara terpisah pada dua terminal:
+```bash
+# Terminal 1: Frontend Bundler
+npm run dev
+
+# Terminal 2: PHP Development Server
+php artisan serve
+```
+Aplikasi dapat diakses melalui browser di `http://127.0.0.1:8000`.
+
+---
+
+## 🔑 Akun Pengujian Default (Seeder)
+
+Jika menggunakan `php artisan db:seed`, berikut adalah daftar akun pengujian default:
+
+| Role | Email | Password |
+|---|---|---|
+| **Admin** | `admin@gmail.com` | `12345678` |
+| **Manager** | `manager@gmail.com` | `12345678` |
+| **Mandor** | `mandor@gmail.com` | `12345678` |
+| **User (Pekerja)** | `user@gmail.com` | `12345678` |
+| **Security** | `security@gmail.com` | `12345678` |
+| **Cleaning** | `cleaning@gmail.com` | `12345678` |
+| **Kantoran** | `kantoran@gmail.com` | `12345678` |
+
+---
+
+## 📁 Struktur Utama Direktori
+
+```text
+tubesmsbd/
+├── app/
+│   ├── Http/Controllers/     # Controller pengatur logika aplikasi per role & fitur
+│   └── Models/               # Model Eloquent (User, Attendance, LaporanPanen, Rapot, dll)
+├── database/
+│   ├── migrations/           # Skema tabel database
+│   └── seeders/              # Data pengujian awal
+├── public/                   # Asset publik & storage link
+├── resources/
+│   ├── css/                  # Styling Tailwind CSS
+│   ├── js/                   # Script frontend Alpine.js
+│   └── views/                # Blade views (Dashboard, Absensi, Rapot, Laporan, dll)
+├── routes/
+│   └── web.php               # Routing aplikasi berbasis autentikasi & role middleware
+├── sipirokindah.sql          # Dump file database awal
+└── vite.config.js            # Konfigurasi bundler Vite
+```
+
+---
+
+## 📄 Lisensi
+
+Proyek ini dikembangkan untuk kebutuhan Tugas Besar Manajemen Sistem Basis Data (MSBD). Lisensi bersifat internal dan mengikuti standar lisensi open-source Laravel (MIT License).
+
